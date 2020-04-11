@@ -6,7 +6,7 @@
                     <slider :loop="true">
                         <div v-for="(item,index) in slider" :key="index">
                             <a>
-                                <img :src="item.pic" @load="loadimg" />
+                                <img :src="item.pic" @load="loadimg" width="100%" />
                             </a>
                         </div>
                     </slider>

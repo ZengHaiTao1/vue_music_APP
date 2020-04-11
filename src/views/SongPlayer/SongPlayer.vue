@@ -17,6 +17,7 @@
                     />
                 </div>
                 <div class="background layer"></div>
+                <!--             顶部          -->
                 <div class="top">
                     <div class="icon" @click="closeFullscreen">
                         <span class="iconfont icon-jiantou1"></span>
@@ -26,11 +27,13 @@
                         <div class="autor">{{currenSong.name}}</div>
                     </div>
                 </div>
+                <!--                中部 -->
                 <div class="center">
+                    <div class="needle" :class="!playing?'pause':''" ref="needle"></div>
                     <div class="Record">
                         <div class="cd" v-if="currenSong" ref="cdWrapper">
                             <img
-                                class="image"
+                                class="image animation"
                                 :class="!playing?'pause':''"
                                 ref="imgRot"
                                 :src="currenSong.imgSrc+'?param=300x300'"
@@ -39,7 +42,15 @@
                         </div>
                     </div>
                 </div>
+                <!--           底部           -->
                 <div class="bottom">
+                    <div class="Progressbar-wapper">
+                        <Progressbar
+                            @percentChange="percentChange"
+                            :currentTime="currentTime"
+                            :duration="duration"
+                        ></Progressbar>
+                    </div>
                     <div class="btnList">
                         <span class="iconfont icon-sort"></span>
                         <span class="iconfont icon-houtui" @click="prev"></span>
@@ -88,6 +99,7 @@
             v-if="currenSong"
             @play="ready"
             @error="error"
+            @timeupdate="updateTime"
             :src="currenSong.songUrl"
             autoplay
             ref="audio"
@@ -96,6 +108,7 @@
 </template>
 
 <script>
+import Progressbar from "@/components/Progressbar/Progressbar";
 import { mapGetters } from "vuex";
 import { mapMutations } from "vuex";
 import animations from "create-keyframe-animation";
@@ -104,7 +117,9 @@ const transform = prefixStyle("transform");
 export default {
     data() {
         return {
-            songReady: false
+            songReady: false,
+            currentTime: "",
+            duration: ""
         };
     },
     methods: {
@@ -177,28 +192,40 @@ export default {
             this.$refs.cdWrapper.style[transform] = "";
         },
         toggerPlay() {
-            this.setPlaying(!this.playing);
             if (this.$refs.audio.paused) {
                 this.$refs.imgRot.classList.remove("pause");
                 this.$refs.audio.play();
+                this.setPlaying(true);
             } else {
                 this.$refs.imgRot.classList.add("pause");
                 this.$refs.audio.pause();
+                this.setPlaying(false);
             }
         },
         next() {
             if (!this.songReady) {
                 return;
             }
+            this.$refs.needle.classList.add("pause");
+            this.songReady = true;
             let index = this.currentIndex + 1;
             if (index === this.playlist.length) {
                 index = 0;
             }
             this.setCurrentIndex(index);
             this.$refs.imgRot.style[transform] = "rotate(0deg)";
+            if (!this.playing) {
+                this.$refs.imgRot.classList.remove("animation");
+            }
         },
         ready() {
+            this.duration = this.$refs.audio.duration;
             this.songReady = true;
+
+            setTimeout(() => {
+                this.$refs.imgRot.classList.add("animation");
+                this.$refs.needle.classList.remove("pause");
+            }, 500);
         },
         error() {
             this.songReady = true;
@@ -207,12 +234,31 @@ export default {
             if (!this.songReady) {
                 return;
             }
+            this.songReady = true;
             let index = this.currentIndex - 1;
             if (index === -1) {
                 index = this.playlist.length - 1;
             }
             this.setCurrentIndex(index);
             this.$refs.imgRot.style[transform] = "rotate(0deg)";
+        },
+        updateTime(e) {
+            this.currentTime = e.target.currentTime;
+            if (this.currentTime >= this.$refs.audio.duration) {
+                this.next();
+            }
+        },
+        percentChange(percent) {
+            console.log(percent);
+            if (percent >= 1) {
+                this.next();
+                return;
+            }
+            const currentTime = this.$refs.audio.duration * percent;
+            this.$refs.audio.currentTime = currentTime;
+            if (!this.playing) {
+                this.toggerPlay();
+            }
         }
     },
     mounted() {
@@ -234,6 +280,9 @@ export default {
             }
             this.setPlaying(true);
         }
+    },
+    components: {
+        Progressbar
     }
 };
 </script>
@@ -311,6 +360,25 @@ export default {
             display: flex;
             justify-content: center;
             width: 100%;
+            // overflow: hidden;
+            .needle {
+                position: absolute;
+                top: -6.67vw;
+                left: 48vw;
+                width: 25vw;
+                height: 40vw;
+                z-index: 100;
+                background-image: url($baseUrl+"img/needle.png");
+                background-size: contain;
+                transform-origin: 4.5vw 4.5vw 0px;
+                transform: rotate(0deg);
+                background-position: 50% center;
+                background-repeat: no-repeat;
+                transition: all 0.3s ease 0s;
+                &.pause {
+                    transform: rotate(-30deg);
+                }
+            }
             .Record {
                 width: 100%;
                 position: relative;
@@ -340,15 +408,17 @@ export default {
                         height: 68%;
                         margin: auto;
                         border-radius: 50%;
-                        animation: rot 20s linear 0s infinite normal none
-                            running;
                         &.pause {
-                            animation-play-state: paused;
+                            animation-play-state: paused !important;
                         }
                         @keyframes rot {
                             100% {
                                 transform: rotate(360deg);
                             }
+                        }
+                        &.animation {
+                            animation: rot 20s linear 0s infinite normal none
+                                running;
                         }
                     }
                 }
@@ -369,6 +439,10 @@ export default {
                     text-align: center;
                     font-size: 30px;
                 }
+            }
+            .Progressbar-wapper {
+                bottom: 15vh;
+                height: 10vh;
             }
         }
     }
