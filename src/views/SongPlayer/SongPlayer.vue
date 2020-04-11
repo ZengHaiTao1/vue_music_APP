@@ -18,82 +18,22 @@
                 </div>
                 <div class="background layer"></div>
                 <!--             顶部          -->
-                <div class="top">
-                    <div class="icon" @click="closeFullscreen">
-                        <span class="iconfont icon-jiantou1"></span>
-                    </div>
-                    <div class="title" v-if="currenSong">
-                        <div>{{currenSong.songName}}</div>
-                        <div class="autor">{{currenSong.name}}</div>
-                    </div>
-                </div>
-                <!--                中部 -->
-                <div class="center">
-                    <div class="needle" :class="!playing?'pause':''" ref="needle"></div>
-                    <div class="Record">
-                        <div class="cd" v-if="currenSong" ref="cdWrapper">
-                            <img
-                                class="image animation"
-                                :class="!playing?'pause':''"
-                                ref="imgRot"
-                                :src="currenSong.imgSrc+'?param=300x300'"
-                                alt
-                            />
-                        </div>
-                    </div>
-                </div>
+                <PlayerTop ref="PlayerTop"></PlayerTop>
+                <!--              中部 -->
+                <PlayerCenter ref="PlayerCenter"></PlayerCenter>
                 <!--           底部           -->
-                <div class="bottom">
-                    <div class="Progressbar-wapper">
-                        <Progressbar
-                            @percentChange="percentChange"
-                            :currentTime="currentTime"
-                            :duration="duration"
-                        ></Progressbar>
-                    </div>
-                    <div class="btnList">
-                        <span class="iconfont icon-sort"></span>
-                        <span class="iconfont icon-houtui" @click="prev"></span>
-                        <span
-                            class="iconfont"
-                            :class="!playing?'icon-weibiaoti--2':'icon-zanting'"
-                            @click.prevent.stop="toggerPlay"
-                        ></span>
-                        <span class="iconfont icon-qianjin" @click="next"></span>
-                        <span class="iconfont icon-A_-bofangliebiao"></span>
-                    </div>
-                </div>
+                <PlayBottom>
+                    <Progressbar
+                        @percentChange="percentChange"
+                        :currentTime="currentTime"
+                        :duration="duration"
+                    ></Progressbar>
+                </PlayBottom>
             </div>
         </transition>
 
         <!-------    mini播放器部分   ------>
-        <transition name="mini" mode="out-in">
-            <div class="Mini" @click.prevent="openFullscreen" v-show="!fullScreen">
-                <div class="imgWapper" v-if="currenSong">
-                    <img
-                        class="play"
-                        :src="currenSong.imgSrc+'?param=300x300'"
-                        width="40"
-                        height="40"
-                        alt="img"
-                    />
-                </div>
-                <div class="text" v-if="currenSong">
-                    <div class="songNmae">{{currenSong.songName}}</div>
-                    <div class="autor">{{currenSong.name}}</div>
-                </div>
-                <div class="play">
-                    <span
-                        class="iconfont"
-                        @click.prevent.stop="toggerPlay"
-                        :class="!playing?'icon-weibiaoti--2':'icon-zanting'"
-                    ></span>
-                </div>
-                <div class="openList">
-                    <span class="iconfont icon-A_-bofangliebiao"></span>
-                </div>
-            </div>
-        </transition>
+        <PlayerMini></PlayerMini>
 
         <audio
             v-if="currenSong"
@@ -109,12 +49,17 @@
 
 <script>
 import Progressbar from "@/components/Progressbar/Progressbar";
-import { mapGetters } from "vuex";
-import { mapMutations } from "vuex";
+import playMixin from "@/mixin/play";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "@/utils/dom.js";
 const transform = prefixStyle("transform");
+
+import PlayerTop from "@/views/SongPlayer/PlayerTop/PlayerTop";
+import PlayerCenter from "@/views/SongPlayer/PlayerCenter/PlayerCenter";
+import PlayerMini from "@/views/SongPlayer/PlayerMini/PlayerMini";
+import PlayBottom from "@/views/SongPlayer/PlayBottom/PlayBottom";
 export default {
+    mixins: [playMixin],
     data() {
         return {
             songReady: false,
@@ -122,12 +67,10 @@ export default {
             duration: ""
         };
     },
+    mounted() {
+        console.log(this.$refs.PlayerTop);
+    },
     methods: {
-        ...mapMutations("songPlayer", [
-            "setFullScreen",
-            "setPlaying",
-            "setCurrentIndex"
-        ]),
         closeFullscreen() {
             this.setFullScreen(false);
         },
@@ -173,31 +116,39 @@ export default {
                     easing: "linear"
                 }
             });
-            animations.runAnimation(this.$refs.cdWrapper, "move", done); //执行动画
+            animations.runAnimation(
+                this.$refs.PlayerCenter.$refs.cdWrapper,
+                "move",
+                done
+            ); //执行动画
         },
         afterEnter() {
             animations.unregisterAnimation("move");
-            this.$refs.cdWrapper.style.animation = "";
+            this.$refs.PlayerCenter.$refs.cdWrapper.style.animation = "";
         },
         leave(el, done) {
-            this.$refs.cdWrapper.style.transition = "all 0.4s";
+            this.$refs.PlayerCenter.$refs.cdWrapper.style.transition =
+                "all 0.4s";
             const { x, y, scale } = this._getPosAndScale();
-            this.$refs.cdWrapper.style[
+            this.$refs.PlayerCenter.$refs.cdWrapper.style[
                 transform
             ] = `translate3d(${x}px,${y}px,0) scale(${scale})`;
-            this.$refs.cdWrapper.addEventListener("transitionend", done);
+            this.$refs.PlayerCenter.$refs.cdWrapper.addEventListener(
+                "transitionend",
+                done
+            );
         },
         afterLeave() {
-            this.$refs.cdWrapper.style.transition = "";
-            this.$refs.cdWrapper.style[transform] = "";
+            this.$refs.PlayerCenter.$refs.cdWrapper.style.transition = "";
+            this.$refs.PlayerCenter.$refs.cdWrapper.style[transform] = "";
         },
         toggerPlay() {
             if (this.$refs.audio.paused) {
-                this.$refs.imgRot.classList.remove("pause");
+                this.$refs.PlayerCenter.$refs.imgRot.classList.remove("pause");
                 this.$refs.audio.play();
                 this.setPlaying(true);
             } else {
-                this.$refs.imgRot.classList.add("pause");
+                this.$refs.PlayerCenter.$refs.imgRot.classList.add("pause");
                 this.$refs.audio.pause();
                 this.setPlaying(false);
             }
@@ -206,16 +157,19 @@ export default {
             if (!this.songReady) {
                 return;
             }
-            this.$refs.needle.classList.add("pause");
+            this.$refs.PlayerCenter.$refs.needle.classList.add("pause");
             this.songReady = true;
             let index = this.currentIndex + 1;
             if (index === this.playlist.length) {
                 index = 0;
             }
             this.setCurrentIndex(index);
-            this.$refs.imgRot.style[transform] = "rotate(0deg)";
+            this.$refs.PlayerCenter.$refs.imgRot.style[transform] =
+                "rotate(0deg)";
             if (!this.playing) {
-                this.$refs.imgRot.classList.remove("animation");
+                this.$refs.PlayerCenter.$refs.imgRot.classList.remove(
+                    "animation"
+                );
             }
         },
         ready() {
@@ -223,8 +177,8 @@ export default {
             this.songReady = true;
 
             setTimeout(() => {
-                this.$refs.imgRot.classList.add("animation");
-                this.$refs.needle.classList.remove("pause");
+                this.$refs.PlayerCenter.$refs.imgRot.classList.add("animation");
+                this.$refs.PlayerCenter.$refs.needle.classList.remove("pause");
             }, 500);
         },
         error() {
@@ -240,7 +194,8 @@ export default {
                 index = this.playlist.length - 1;
             }
             this.setCurrentIndex(index);
-            this.$refs.imgRot.style[transform] = "rotate(0deg)";
+            this.$refs.PlayerCenter.$refs.imgRot.style[transform] =
+                "rotate(0deg)";
         },
         updateTime(e) {
             this.currentTime = e.target.currentTime;
@@ -261,18 +216,6 @@ export default {
             }
         }
     },
-    mounted() {
-        console.log(this._getPosAndScale());
-    },
-    computed: {
-        ...mapGetters("songPlayer", [
-            "fullScreen",
-            "playing",
-            "currenSong",
-            "playlist",
-            "currentIndex"
-        ])
-    },
     watch: {
         currenSong(newSong, oldSong) {
             if (newSong == oldSong) {
@@ -282,7 +225,11 @@ export default {
         }
     },
     components: {
-        Progressbar
+        Progressbar,
+        PlayerTop,
+        PlayerCenter,
+        PlayerMini,
+        PlayBottom
     }
 };
 </script>
@@ -315,7 +262,6 @@ export default {
                 transform: translate3d(0, 100px, 0);
             }
         }
-
         .background {
             position: absolute;
             left: 0px;
@@ -329,169 +275,6 @@ export default {
                 opacity: 0.3;
                 filter: none;
                 background: rgb(46, 48, 48);
-            }
-        }
-        .top {
-            display: flex;
-            padding: 5px;
-            border-bottom: 1px solid rgba(228, 228, 228, 0.1);
-            height: 8%;
-            box-align: center;
-            .icon {
-                flex: 1;
-                text-align: center;
-                vertical-align: middle;
-                // height: 8%;
-                // line-height: 40px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                span {
-                    font-size: 24px;
-                }
-            }
-            .title {
-                flex: 5;
-            }
-        }
-        .center {
-            height: 62%;
-            position: relative;
-            display: flex;
-            justify-content: center;
-            width: 100%;
-            // overflow: hidden;
-            .needle {
-                position: absolute;
-                top: -6.67vw;
-                left: 48vw;
-                width: 25vw;
-                height: 40vw;
-                z-index: 100;
-                background-image: url($baseUrl+"img/needle.png");
-                background-size: contain;
-                transform-origin: 4.5vw 4.5vw 0px;
-                transform: rotate(0deg);
-                background-position: 50% center;
-                background-repeat: no-repeat;
-                transition: all 0.3s ease 0s;
-                &.pause {
-                    transform: rotate(-30deg);
-                }
-            }
-            .Record {
-                width: 100%;
-                position: relative;
-                display: flex;
-                justify-content: center;
-                .cd {
-                    top: 16%;
-                    position: absolute;
-                    width: 70%;
-                    height: 70vw;
-                    background-size: contain;
-                    border-width: 4px;
-                    background-image: url($baseUrl+"img/cd.png");
-                    border-style: solid;
-                    border-color: rgba(228, 228, 228, 0.1);
-                    border-image: initial;
-                    border-radius: 50%;
-                    background-position: 50% center;
-                    background-repeat: no-repeat;
-                    .image {
-                        position: absolute;
-                        left: 0px;
-                        right: 0px;
-                        top: 0px;
-                        bottom: 0px;
-                        width: 68%;
-                        height: 68%;
-                        margin: auto;
-                        border-radius: 50%;
-                        &.pause {
-                            animation-play-state: paused !important;
-                        }
-                        @keyframes rot {
-                            100% {
-                                transform: rotate(360deg);
-                            }
-                        }
-                        &.animation {
-                            animation: rot 20s linear 0s infinite normal none
-                                running;
-                        }
-                    }
-                }
-            }
-        }
-        .bottom {
-            height: 30%;
-            position: relative;
-            .btnList {
-                position: absolute;
-                bottom: 5vh;
-                width: 100vw;
-                height: 10vh;
-                display: flex;
-                justify-content: center;
-                span {
-                    flex: 1;
-                    text-align: center;
-                    font-size: 30px;
-                }
-            }
-            .Progressbar-wapper {
-                bottom: 15vh;
-                height: 10vh;
-            }
-        }
-    }
-    .Mini {
-        position: fixed;
-        bottom: 0;
-        width: 100%;
-        height: 60px;
-        background: rgb(228, 228, 228);
-        z-index: 160;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        padding: 5px 10px;
-        &.mini-enter-active,
-        .fade-leave-active {
-            transition: transform 0.5s;
-        }
-        &.mini-enter,
-        .mini-leave-to {
-            opacity: 0;
-            transform: translate3d(0, 100px, 0);
-        }
-        .imgWapper {
-            margin-left: 10px;
-            flex: 1;
-            img {
-                border-radius: 50%;
-            }
-        }
-        .text {
-            flex: 4;
-            .autor {
-                margin-top: 3px;
-                font-size: 14px;
-            }
-        }
-        .play {
-            flex: 1;
-            span {
-                font-size: 28px;
-                padding: 5px;
-            }
-        }
-        .openList {
-            flex: 1;
-            span {
-                font-size: 24px;
-                padding: 5px;
             }
         }
     }
