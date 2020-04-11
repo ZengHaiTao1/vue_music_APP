@@ -32,3 +32,13 @@ export function getsingerDetails(id) {
         }
     })
 }
+
+export function getLyric(id) {
+    return window.axiosInstance({
+        method: 'get',
+        url: '/lyric',
+        params: {
+            id
+        }
+    })
+}

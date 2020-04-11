@@ -60,6 +60,7 @@ export default {
                 obj.al = cur.al.name;
                 obj.songUrl = `https://music.163.com/song/media/outer/url?id=${cur.id}.mp3 `;
                 obj.imgSrc = cur.al.picUrl;
+                obj.id = cur.id;
                 arr.push(obj);
                 this.List = arr;
             });

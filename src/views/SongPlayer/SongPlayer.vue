@@ -48,16 +48,17 @@
 </template>
 
 <script>
-import Progressbar from "@/components/Progressbar/Progressbar";
 import playMixin from "@/mixin/play";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "@/utils/dom.js";
 const transform = prefixStyle("transform");
 
+import Progressbar from "@/components/Progressbar/Progressbar";
 import PlayerTop from "@/views/SongPlayer/PlayerTop/PlayerTop";
 import PlayerCenter from "@/views/SongPlayer/PlayerCenter/PlayerCenter";
 import PlayerMini from "@/views/SongPlayer/PlayerMini/PlayerMini";
 import PlayBottom from "@/views/SongPlayer/PlayBottom/PlayBottom";
+
 export default {
     mixins: [playMixin],
     data() {
@@ -67,10 +68,10 @@ export default {
             duration: ""
         };
     },
-    mounted() {
-        console.log(this.$refs.PlayerTop);
-    },
     methods: {
+        getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min + 1)) + min;
+        },
         closeFullscreen() {
             this.setFullScreen(false);
         },
@@ -139,6 +140,7 @@ export default {
             );
         },
         afterLeave() {
+            console.log(123);
             this.$refs.PlayerCenter.$refs.cdWrapper.style.transition = "";
             this.$refs.PlayerCenter.$refs.cdWrapper.style[transform] = "";
         },
@@ -152,6 +154,7 @@ export default {
                 this.$refs.audio.pause();
                 this.setPlaying(false);
             }
+            this.$refs.PlayerCenter.togglePlaying();
         },
         next() {
             if (!this.songReady) {
@@ -160,7 +163,9 @@ export default {
             this.$refs.PlayerCenter.$refs.needle.classList.add("pause");
             this.songReady = true;
             let index = this.currentIndex + 1;
-            if (index === this.playlist.length) {
+            if (this.mode === "random") {
+                index = this.getRandomInt(0, this.playlist.length);
+            } else if (index === this.playlist.length) {
                 index = 0;
             }
             this.setCurrentIndex(index);
@@ -171,6 +176,7 @@ export default {
                     "animation"
                 );
             }
+            // this.$refs.PlayerCenter.lyricList.scrollTo(0, 0, 500);
         },
         ready() {
             this.duration = this.$refs.audio.duration;
@@ -190,7 +196,9 @@ export default {
             }
             this.songReady = true;
             let index = this.currentIndex - 1;
-            if (index === -1) {
+            if (this.mode === "random") {
+                index = this.getRandomInt(0, this.playlist.length);
+            } else if (index === -1) {
                 index = this.playlist.length - 1;
             }
             this.setCurrentIndex(index);
@@ -200,6 +208,11 @@ export default {
         updateTime(e) {
             this.currentTime = e.target.currentTime;
             if (this.currentTime >= this.$refs.audio.duration) {
+                if (this.mode === "loop") {
+                    this.$refs.audio.currentTime = 0;
+                    this.$refs.audio.play();
+                    return;
+                }
                 this.next();
             }
         },
@@ -214,8 +227,12 @@ export default {
             if (!this.playing) {
                 this.toggerPlay();
             }
+            if (this.$refs.PlayerCenter.currentLyric) {
+                this.$refs.PlayerCenter.currentLyric.seek(currentTime * 1000);
+            }
         }
     },
+    mounted() {},
     watch: {
         currenSong(newSong, oldSong) {
             if (newSong == oldSong) {

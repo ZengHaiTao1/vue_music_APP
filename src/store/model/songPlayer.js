@@ -1,8 +1,10 @@
+
 const state = {
     playing: false,   //播放中
     fullScreen: false,  //全屏
     playlist: [],   //播放列表
-    currentIndex: -1,  //歌曲索引
+    currentIndex: -1,  //歌曲索引,
+    mode: "order"
 }
 const getters = {
     playing: state => state.playing,
@@ -11,7 +13,8 @@ const getters = {
     currentIndex: state => state.currentIndex,
     currenSong: state => {
         return state.playlist[state.currentIndex]
-    }
+    },
+    mode: state => state.mode
 }
 const mutations = {
     setPlaying(state, value) {
@@ -25,6 +28,9 @@ const mutations = {
     },
     setCurrentIndex(state, value) {
         state.currentIndex = value
+    },
+    setMode(state, value) {
+        state.mode = value
     },
 }
 const actions = {

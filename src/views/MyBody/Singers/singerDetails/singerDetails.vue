@@ -61,21 +61,16 @@ export default {
         back() {
             this.$router.back();
         },
-        paly(data) {
-            console.log(data);
-            // let singer = {};
-            // singer.name = this.name;
+        paly() {
+            // console.log(data);
         }
     },
     mounted() {
         // let id = this.$route.params.id;
-        // console.log(id);
         this.imageHeight = this.$refs.singerImg.clientHeight; //获取图片高度
         this.$refs.scrollWapper.style.top = `${this.imageHeight - 10}px`; //设置初始top值
         this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT; //获取滚到距离顶部40px的位置
         getsingerDetails(this.id).then(res => {
-            // let song = new Song();
-            // console.log(res.data.hotSongs);
             this.name = res.data.artist.name;
             this.bgStyle = `background-image:url(${res.data.artist.picUrl}?param=400x400)`;
             // this.setSongList(res.data.hotSongs);
