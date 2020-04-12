@@ -8,6 +8,7 @@
             @after-leave="afterLeave"
         >
             <div class="Fullscreen" v-show="fullScreen">
+                <!--           背景部分      -->
                 <div class="background" v-if="currenSong">
                     <img
                         :src="currenSong.imgSrc+'?param=300x300'"
@@ -17,10 +18,13 @@
                     />
                 </div>
                 <div class="background layer"></div>
+
                 <!--             顶部          -->
                 <PlayerTop ref="PlayerTop"></PlayerTop>
+
                 <!--              中部 -->
                 <PlayerCenter ref="PlayerCenter"></PlayerCenter>
+
                 <!--           底部           -->
                 <PlayBottom>
                     <Progressbar
@@ -140,7 +144,6 @@ export default {
             );
         },
         afterLeave() {
-            console.log(123);
             this.$refs.PlayerCenter.$refs.cdWrapper.style.transition = "";
             this.$refs.PlayerCenter.$refs.cdWrapper.style[transform] = "";
         },
@@ -217,11 +220,6 @@ export default {
             }
         },
         percentChange(percent) {
-            console.log(percent);
-            if (percent >= 1) {
-                this.next();
-                return;
-            }
             const currentTime = this.$refs.audio.duration * percent;
             this.$refs.audio.currentTime = currentTime;
             if (!this.playing) {
@@ -229,6 +227,15 @@ export default {
             }
             if (this.$refs.PlayerCenter.currentLyric) {
                 this.$refs.PlayerCenter.currentLyric.seek(currentTime * 1000);
+            }
+            if (percent >= 1) {
+                if (this.mode === "loop") {
+                    this.$refs.audio.currentTime = 0;
+                    this.$refs.audio.play();
+                    return;
+                }
+                this.next();
+                return;
             }
         }
     },

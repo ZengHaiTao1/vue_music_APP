@@ -1,7 +1,7 @@
 
 const state = {
     playing: false,   //播放中
-    fullScreen: false,  //全屏
+    fullScreen: "",  //全屏
     playlist: [],   //播放列表
     currentIndex: -1,  //歌曲索引,
     mode: "order"

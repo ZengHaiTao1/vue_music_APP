@@ -2,7 +2,7 @@
     <div class="Singers">
         <scrollNav :title="catTitle" :catList="catList" :fn="catfn"></scrollNav>
         <scrollNav :title="IniTitle" :catList="IniList" :fn="Intfn"></scrollNav>
-        <div class="scroll-wapper" v-if="SingerList.length">
+        <div class="scroll-wapper" ref="scrollWapper">
             <scroll
                 class="scroll"
                 :data="SingerList"
@@ -11,17 +11,19 @@
                 @scrollToEnd="scrollToEnd"
             >
                 <div>
-                    <div
-                        class="img-wapper"
-                        v-for="(item,index) in SingerList"
-                        :key="index"
-                        @click="gotoDetails(item.id)"
-                    >
-                        <img v-lazy="item.img1v1Url+'?param=200x200'" />
-                        <span>
-                            <span class="imgTitle">{{item.name}}</span>
-                        </span>
-                    </div>
+                    <template v-if="SingerList.length">
+                        <div
+                            v-for="(item,index) in SingerList"
+                            class="img-wapper"
+                            :key="index"
+                            @click="gotoDetails(item.id)"
+                        >
+                            <img v-lazy="item.img1v1Url+'?param=200x200'" />
+                            <span>
+                                <span class="imgTitle">{{item.name}}</span>
+                            </span>
+                        </div>
+                    </template>
                 </div>
             </scroll>
         </div>
@@ -39,8 +41,10 @@ import { getSingers } from "@/http/recommend-http.js";
 import scrollNav from "@/components/scrollNav/scrollNav";
 import scroll from "@/components/scroll/scroll";
 import loading from "@/components/loading/loading";
+
+import bottomMixin from "@/mixin/bottomPlay";
 export default {
-    name: "",
+    mixins: [bottomMixin],
     data() {
         return {
             SingerList: [],
@@ -110,6 +114,7 @@ export default {
             page: 1
         };
     },
+
     methods: {
         catfn(index) {
             if (index === undefined) {
@@ -149,10 +154,20 @@ export default {
         gotoDetails(id) {
             //去歌手详情页面
             this.$router.push({ path: "/singers/" + id });
+        },
+        changScroll() {
+            if (this.fullScreen !== "") {
+                console.log(this.$refs.scrollWapper);
+                this.$nextTick(() => {
+                    this.$refs.scrollWapper.style.bottom = "70px";
+                    this.$refs.scroll.refresh();
+                });
+            }
         }
     },
     mounted() {
         this.getData();
+        this.changScroll();
     },
     components: {
         scrollNav,
@@ -187,6 +202,7 @@ export default {
             width: 100%;
             height: 100%;
             overflow: hidden;
+            position: relative;
             .img-wapper {
                 display: flex;
                 border-bottom: 1px solid rgb(228, 228, 228);

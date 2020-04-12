@@ -14,7 +14,7 @@
             </a>-->
 
             <template v-for="(item,index) in songList">
-                <a class="list-item" :key="index">
+                <a class="list-item" :key="index" @click="chang(item.id)">
                     <div class="img">
                         <img class="u-img" v-lazy="item.picUrl" />
                         <span class="iconfont icon-erji">&nbsp;&nbsp;{{item.playCount|play}}万</span>
@@ -35,10 +35,17 @@ export default {
             songList: []
         };
     },
-    methods: {},
+    methods: {
+        chang(id) {
+            this.$router.push({
+                path: `/recommend/${id}`
+            });
+        }
+    },
     mounted() {
         getSongs().then(res => {
             this.songList = res.data.result;
+            console.log(this.songList);
         });
     },
     filters: {

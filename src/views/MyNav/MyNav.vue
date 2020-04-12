@@ -19,7 +19,7 @@ export default {
 <style scoped lang="scss">
 nav {
     background: white;
-    z-index: 1000;
+    z-index: -1;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -38,7 +38,7 @@ nav {
                 position: absolute;
                 left: 0;
                 bottom: -1px;
-                z-index: 3;
+                z-index: 0;
                 width: 100%;
                 height: 4px;
                 -webkit-transform: scaleY(0.5);

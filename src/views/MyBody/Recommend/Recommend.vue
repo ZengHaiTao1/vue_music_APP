@@ -1,5 +1,5 @@
 <template>
-    <div class="Recommend">
+    <div class="Recommend" ref="Recommend">
         <scroll class="recommend-content" ref="scroll">
             <div>
                 <div class="slider-wrapper" v-if="slider.length">
@@ -14,6 +14,11 @@
                 <Songs @loadData="getData"></Songs>
             </div>
         </scroll>
+        <transition name="slide">
+            <keep-alive>
+                <router-view :key="$route.path"></router-view>
+            </keep-alive>
+        </transition>
     </div>
 </template>
 <script>
@@ -21,7 +26,9 @@ import Slider from "@/components/slider/Slider";
 import Scroll from "@/components/scroll/scroll";
 import Songs from "@/views/MyBody/Recommend/Songs/Songs";
 import { getBanner } from "@/http/recommend-http.js";
+import bottomMixin from "@/mixin/bottomPlay";
 export default {
+    mixins: [bottomMixin],
     data() {
         return {
             slider: [],
@@ -37,6 +44,12 @@ export default {
         },
         getData() {
             this.$refs.scroll.refresh();
+        },
+        changScroll() {
+            if (this.fullScreen !== "") {
+                this.$refs.Recommend.style.bottom = "70px";
+                this.$refs.scroll.refresh();
+            }
         }
     },
     components: {
@@ -48,6 +61,7 @@ export default {
         getBanner().then(res => {
             this.slider = res.data.banners;
         });
+        this.changScroll();
     }
 };
 </script>
@@ -58,6 +72,7 @@ export default {
     top: 91px;
     bottom: 0;
     .recommend-content {
+        position: relative;
         height: 100%;
         overflow: hidden;
     }
@@ -66,5 +81,14 @@ export default {
     width: 100%;
     position: relative;
     overflow: hidden;
+}
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 0.3s;
+}
+
+.slide-enter,
+.slide-leave-to {
+    transform: translate3d(100%, 0, 0);
 }
 </style>

@@ -6,7 +6,14 @@ Vue.use(VueRouter)
 const routes = [
     {
         path: "/recommend",
-        component: () => import("@/views/MyBody/Recommend/Recommend.vue")
+        component: () => import("@/views/MyBody/Recommend/Recommend.vue"),
+        children: [
+            {
+                path: ":id",
+                component: () => import("@/views/MyBody/Singers/singerDetails/singerDetails"),
+                props: true
+            },
+        ]
     },
     {
         path: "/singers",
@@ -20,8 +27,15 @@ const routes = [
         ]
     },
     {
-        path: "/Rank",
-        component: () => import("@/views/MyBody/Rank/Rank.vue")
+        path: "/rank",
+        component: () => import("@/views/MyBody/Rank/Rank.vue"),
+        children: [
+            {
+                path: ":id",
+                component: () => import("@/views/MyBody/Singers/singerDetails/singerDetails"),
+                props: true
+            },
+        ]
     }
 
 ]

@@ -16,7 +16,7 @@
                 :probe-type="3"
             >
                 <div>
-                    <songlist :songList="songList" @play="paly"></songlist>
+                    <songlist :songList="songList"></songlist>
                 </div>
             </scroll>
         </div>
@@ -24,7 +24,7 @@
 </template>
 
 <script>
-import { getsingerDetails } from "@/http/recommend-http.js";
+import { getsingerDetails, getSongDetails } from "@/http/recommend-http.js";
 import songlist from "@/components/songList/songList";
 // import { mapMutations } from "vuex";
 import scroll from "@/components/scroll/scroll";
@@ -33,8 +33,9 @@ import { mapGetters } from "vuex";
 import { prefixStyle } from "@/utils/dom.js";
 const RESERVED_HEIGHT = 40; //定义顶部高度
 const transform = prefixStyle("transform");
-
+import bottomPlay from "@/mixin/bottomPlay";
 export default {
+    mixins: [bottomPlay],
     data() {
         return {
             songList: [],
@@ -61,8 +62,11 @@ export default {
         back() {
             this.$router.back();
         },
-        paly() {
-            // console.log(data);
+        changScroll() {
+            if (this.fullScreen !== "") {
+                this.$refs.scrollWapper.style.bottom = "70px";
+                this.$refs.scroll.refresh();
+            }
         }
     },
     mounted() {
@@ -70,12 +74,25 @@ export default {
         this.imageHeight = this.$refs.singerImg.clientHeight; //获取图片高度
         this.$refs.scrollWapper.style.top = `${this.imageHeight - 10}px`; //设置初始top值
         this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT; //获取滚到距离顶部40px的位置
-        getsingerDetails(this.id).then(res => {
-            this.name = res.data.artist.name;
-            this.bgStyle = `background-image:url(${res.data.artist.picUrl}?param=400x400)`;
-            // this.setSongList(res.data.hotSongs);
-            this.songList = res.data.hotSongs;
-        });
+        console.log(this.$route);
+        if (this.$route.fullPath.indexOf("/singers") != -1) {
+            getsingerDetails(this.id).then(res => {
+                this.name = res.data.artist.name;
+                this.bgStyle = `background-image:url(${res.data.artist.picUrl}?param=400x400)`;
+                this.songList = res.data.hotSongs;
+            });
+        } else if (
+            this.$route.fullPath.indexOf("/recommend") != -1 ||
+            this.$route.fullPath.indexOf("/rank") != -1
+        ) {
+            getSongDetails(this.id).then(res => {
+                console.log(res);
+                this.name = res.data.playlist.name;
+                this.bgStyle = `background-image:url(${res.data.playlist.coverImgUrl}?param=400x400)`;
+                this.songList = res.data.playlist.tracks;
+            });
+        }
+        this.changScroll();
     },
     components: {
         songlist,
@@ -83,14 +100,6 @@ export default {
     },
     computed: {
         ...mapGetters("songPlayer", ["fullScreen"])
-    },
-    watch: {
-        fullScreen(newValue) {
-            if (!newValue) {
-                this.$refs.scrollWapper.style.bottom = "70px";
-                this.$refs.scroll.refresh();
-            }
-        }
     },
     created() {
         console.log(123);

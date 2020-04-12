@@ -77,9 +77,6 @@ export default {
             this.setPlaylist(this.List); //添加播放列表
             this.setFullScreen(true); //全屏播放
             this.setCurrentIndex(index);
-            this.$emit("play", this.List);
-            // let singer = this.singer;
-            // singer.songName =
         }
     },
     mounted() {}
