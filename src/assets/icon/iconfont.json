@@ -6,6 +6,20 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "3599607",
+      "name": "删  除",
+      "font_class": "shanchu",
+      "unicode": "e608",
+      "unicode_decimal": 58888
+    },
+    {
+      "icon_id": "9977346",
+      "name": "删 除",
+      "font_class": "shanchu1",
+      "unicode": "e609",
+      "unicode_decimal": 58889
+    },
+    {
       "icon_id": "3245409",
       "name": "播放",
       "font_class": "D-bianjishipin-shezhizhuti",

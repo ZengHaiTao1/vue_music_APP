@@ -84,6 +84,14 @@ export function getToplist() {
         url: '/toplist',
     })
 }
-
+/**
+ * 获取热搜榜
+ */
+export function getSearchHot() {
+    return window.axiosInstance({
+        method: 'get',
+        url: '/search/hot/detail',
+    })
+}
 
 

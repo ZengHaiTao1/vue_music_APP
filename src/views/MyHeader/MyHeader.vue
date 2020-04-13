@@ -2,7 +2,7 @@
     <div class="MyHeader">
         <span class="iconfont icon-mulu"></span>
         <span class="title">Music</span>
-        <span class="iconfont icon-sousuo"></span>
+        <router-link tag="span" to="/search" class="iconfont icon-sousuo"></router-link>
     </div>
 </template>
 

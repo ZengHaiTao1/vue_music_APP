@@ -10,7 +10,7 @@
                                 <img class="u-img" v-lazy="item.coverImgUrl" />
                                 <span
                                     class="iconfont icon-erji"
-                                >&nbsp;&nbsp;{{item.updateFrequency}}万</span>
+                                >&nbsp;&nbsp;{{item.updateFrequency}}</span>
                             </div>
                             <div class="remd-text">{{item.name}}</div>
                         </a>

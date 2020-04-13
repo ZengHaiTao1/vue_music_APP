@@ -5,6 +5,10 @@ Vue.use(VueRouter)
 
 const routes = [
     {
+        path: "*",
+        redirect: "/recommend"
+    },
+    {
         path: "/recommend",
         component: () => import("@/views/MyBody/Recommend/Recommend.vue"),
         children: [
@@ -36,12 +40,17 @@ const routes = [
                 props: true
             },
         ]
+    },
+    {
+        path: "/search",
+        component: () => import("@/views/MyBody/Search/Search"),
     }
 
 ]
 
 const router = new VueRouter({
-    routes
+    routes,
+    mode: "history",
 })
 
 export default router
