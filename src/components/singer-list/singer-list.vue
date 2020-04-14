@@ -1,8 +1,8 @@
 <template>
     <div class="singer-list">
         <ul>
-            <template v-for="item in data">
-                <li class="list-wapper" :key="item.id">
+            <template v-for="(item,index) in data">
+                <li class="list-wapper" :key="index" @click="clickOne(index)">
                     <div class="img">
                         <img :src="item.picUrl+'?param=200x200'" />
                     </div>
@@ -21,7 +21,11 @@ export default {
     data() {
         return {};
     },
-    methods: {},
+    methods: {
+        clickOne(index) {
+            this.$emit("clickOne", index);
+        }
+    },
     props: ["data"]
 };
 </script>

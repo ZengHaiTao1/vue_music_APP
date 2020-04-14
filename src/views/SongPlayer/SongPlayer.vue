@@ -192,6 +192,7 @@ export default {
         },
         error() {
             this.songReady = true;
+            // this.next();
         },
         prev() {
             if (!this.songReady) {
@@ -267,7 +268,7 @@ export default {
         top: 0;
         left: 0;
         background: whitesmoke;
-        z-index: 150;
+        z-index: 220;
         &.normal-enter-active,
         &.normal-leave-active {
             transition: all 0.4s;

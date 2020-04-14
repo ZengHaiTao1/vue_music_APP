@@ -2,7 +2,7 @@
     <div class="list-view">
         <ul>
             <template v-for="(item,index) in data">
-                <li class="list-wapper" :key="index" @click="clickOne(item)">
+                <li class="list-wapper" :key="index" @click="clickOne(index)">
                     <div class="index">
                         <span>{{index+1}}</span>
                     </div>
@@ -52,7 +52,7 @@ export default {
         }
     },
     mounted() {
-        console.log(this.data);
+        // console.log(this.data);
     }
 };
 </script>

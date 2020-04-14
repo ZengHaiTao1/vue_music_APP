@@ -1,5 +1,5 @@
 <template>
-    <transition name="slide">
+    <transition name="slide" mode="out-in">
         <div class="search">
             <div class="top">
                 <span data-v-1487e444 class="iconfont icon-fanhui back" @click="back"></span>
@@ -19,9 +19,19 @@
                     </div>
 
                     <div class="History-list">
-                        <scroll :data="searchHistory" :scrollX="true" :scrollY="false">
+                        <scroll
+                            :data="searchHistory"
+                            :scrollX="true"
+                            :scrollY="false"
+                            ref="History-scroll"
+                        >
                             <ul class="list-wapper">
-                                <li class="list" v-for="item in searchHistory" :key="item">{{item}}</li>
+                                <li
+                                    class="list"
+                                    v-for="item in searchHistory"
+                                    @click.stop.prevent="changeSearchText(item)"
+                                    :key="item"
+                                >{{item}}</li>
                             </ul>
                         </scroll>
                     </div>
@@ -29,7 +39,7 @@
                 <div class="searchHot">
                     <h1 class="title">热搜榜</h1>
                     <scroll class="scroll" ref="scroll">
-                        <ListView @clickOne="clickOne" class="list" :data="searchHotList"></ListView>
+                        <ListView @clickOne="clickSearchHot" class="list" :data="searchHotList"></ListView>
                     </scroll>
                 </div>
             </div>
@@ -43,15 +53,15 @@
                 <div class="ResultWapper">
                     <div class="searchResult" v-show="singers.length>0">
                         <h1 class="title">相关歌手</h1>
-                        <SingerList :data="singers"></SingerList>
+                        <SingerList @clickOne="clickSinger" :data="singers"></SingerList>
                     </div>
                     <div class="searchResult" v-show="songSheet.length>0">
                         <h1 class="title">相关歌单</h1>
-                        <SingerList :data="songSheet"></SingerList>
+                        <SingerList @clickOne="clickSongSheet" :data="songSheet"></SingerList>
                     </div>
                     <div class="searchResult" v-show="songList.length >0">
                         <h1 class="title">相关歌曲</h1>
-                        <ListView :data="songList"></ListView>
+                        <ListView :data="songList" @clickOne="clickSong"></ListView>
                     </div>
                 </div>
             </scroll>
@@ -85,6 +95,7 @@ export default {
     },
     methods: {
         ...mapActions("searchHistory", ["addHistory", "clear"]),
+        ...mapActions("songPlayer", ["addSong"]),
         clearsearchText() {
             this.searchText = "";
             this.focus();
@@ -94,11 +105,18 @@ export default {
         },
         back() {
             this.$router.back();
+            if (this.searchText !== "") {
+                this.addHistory(this.searchText);
+                this.searchText = "";
+            }
         },
-        clickOne(value) {
-            console.log(value);
-            this.addHistory(value.title);
-            this.searchText = value.title;
+        clickSearchHot(index) {
+            let title = this.searchHotList[index].title;
+            this.changeSearchText(title);
+        },
+        changeSearchText(value) {
+            this.addHistory(value);
+            this.searchText = value;
         },
         changBottom() {
             if (this.searchHistory.length > 0) {
@@ -109,13 +127,37 @@ export default {
                 this.$refs.scroll.refresh();
             }
         },
+        clickSong(index) {
+            let song = this.songList[index];
+            let obj = {};
+            obj.songUrl = `https://music.163.com/song/media/outer/url?id=${song.id}.mp3 `;
+            obj.name = song.describe.split("-")[0];
+            obj.songName = song.title;
+            obj.imgSrc = song.imgSrc;
+            obj.id = song.id;
+            this.addSong(obj);
+            
+        },
+        clickSinger(index) {
+            let singer = this.singers[index];
+            console.log(this.singers[index]);
+            this.$router.push({
+                path: `/singers/${singer.id}`
+            });
+        },
+        clickSongSheet(index) {
+            let SongSheet = this.songSheet[index];
+            console.log(SongSheet);
+            this.$router.push({
+                path: `/recommend/${SongSheet.id}`
+            });
+        },
         getSearchResult() {
             if (this.searchText === "") {
                 return;
             }
             getSearchResult(this.searchText).then(res => {
-                console.log(res);
-
+                // console.log(res);
                 if (res.songSheet) {
                     res.songSheet.forEach(cur => {
                         let obj = {};
@@ -135,8 +177,11 @@ export default {
                             if (index < array.length - 1) {
                                 describe += "/";
                             }
+                            obj.imgSrc = cur.img1v1Url;
                         });
+                        obj.id = cur.id;
                         obj.describe = `${describe}-${cur.album.name}`;
+                        console.log(cur);
                         this.songList.push(obj);
                     });
                 }
@@ -144,7 +189,7 @@ export default {
                 console.log(this.songList);
                 console.log(this.songSheet);
                 console.log(res);
-                this.singers = this.singers || [];
+                this.singers = res.singers || [];
                 this.songList = this.songList || [];
                 this.songSheet = this.songSheet || [];
             });
@@ -153,7 +198,7 @@ export default {
     mounted() {
         this.focus();
         getSearchHot().then(res => {
-            console.log(res);
+            // console.log(res);
             res.data.data.forEach(cur => {
                 let obj = {};
                 obj.title = cur.searchWord;
@@ -162,7 +207,7 @@ export default {
                 obj.iconUrl = cur.iconUrl;
                 this.searchHotList.push(obj);
             });
-            console.log(this.searchHotList);
+            // console.log(this.searchHotList);
         });
         this.changBottom();
     },
@@ -175,11 +220,19 @@ export default {
         searchHistory() {
             this.changBottom();
         },
-        searchText() {
+        searchText(newText, oldText) {
+            // console.log(this.$refs["History-scroll"].scroll);
             if (this.searchText === "") {
                 this.singers = [];
                 this.songList = [];
                 this.songSheet = [];
+                this.$nextTick(() => {
+                    this.$refs["History-scroll"].refresh();
+                    this.$refs["scroll"].refresh();
+                });
+            }
+            if (newText.length < oldText.length) {
+                this.addHistory(oldText);
             }
             this.getSearchResult();
             this.$refs.ResultScroll.scrollTo(0, 0, 0);

@@ -53,7 +53,7 @@ export default {
     width: 100%;
     height: 60px;
     background: rgb(228, 228, 228);
-    z-index: 160;
+    z-index: 210;
     display: flex;
     justify-content: center;
     align-items: center;

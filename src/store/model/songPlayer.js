@@ -32,8 +32,30 @@ const mutations = {
     setMode(state, value) {
         state.mode = value
     },
+    addSong(state, song) {
+        if (state.playlist.length === 0) {
+            state.playlist.push(song)
+            state.currentIndex = 0
+            state.fullScreen = true
+            return
+        }
+        let index = state.playlist.findIndex((cur) => {
+            return cur.id === song.id
+        })
+        if (index >= 0) {
+            state.currentIndex = index
+        } else {
+            state.playlist.splice(state.currentIndex + 1, 0, song)
+            state.currentIndex++;
+        }
+        state.fullScreen = true
+        console.log(state.playlist)
+    }
 }
 const actions = {
+    addSong({ commit }, data) {
+        commit('addSong', data)
+    }
 
 }
 const songPlayer = {

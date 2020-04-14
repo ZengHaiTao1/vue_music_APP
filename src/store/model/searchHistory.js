@@ -1,6 +1,6 @@
 import storage from 'good-storage'
 const state = {
-    searchHistory: storage.get("_searchHistory_")||[]
+    searchHistory: storage.get("_searchHistory_") || []
 }
 const getters = {
     searchHistory: state => {
@@ -12,32 +12,32 @@ const mutations = {
         state.searchHistory = data
     },
     addHistory(state, data) {
-       let index =  state.searchHistory.findIndex((cur)=>{
-            return data===cur
+        let index = state.searchHistory.findIndex((cur) => {
+            return data === cur
         })
-        if(index>-1){
-            state.searchHistory.splice(index,1)
+        if (index > -1) {
+            state.searchHistory.splice(index, 1)
             state.searchHistory.unshift(data)
-        }else{
-            if(state.searchHistory.length>=15){
+        } else {
+            if (state.searchHistory.length >= 15) {
                 state.searchHistory.pop()
             }
             state.searchHistory.unshift(data)
         }
-        storage.set("_searchHistory_",state.searchHistory)
+        storage.set("_searchHistory_", state.searchHistory)
     },
-    clear(state){
+    clear(state) {
         state.searchHistory = [],
-        storage.remove("_searchHistory_")
+            storage.remove("_searchHistory_")
     }
 }
 const actions = {
-    addHistory ({ commit },data) {
-        commit('addHistory',data)
-      },
-      clear({ commit }){
+    addHistory({ commit }, data) {
+        commit('addHistory', data)
+    },
+    clear({ commit }) {
         commit('clear')
-      }
+    }
 }
 const searchHistory = {
     state: state,

@@ -28,11 +28,11 @@
             </scroll>
         </div>
         <loading v-show="!SingerList.length"></loading>
-        <transition name="slide">
-            <keep-alive>
+        <keep-alive>
+            <transition name="slide" mode="out-in">
                 <router-view :key="$route.path"></router-view>
-            </keep-alive>
-        </transition>
+            </transition>
+        </keep-alive>
     </div>
 </template>
 
