@@ -94,4 +94,43 @@ export function getSearchHot() {
     })
 }
 
+/**
+ * 获取搜索建议
+ * @param  {} keywords
+ */
+export function getSearcSuggest(keywords) {
+    return window.axiosInstance({
+        method: 'get',
+        url: '/search/suggest',
+        params: {
+            keywords
+        }
+    })
+}
+export function getSearcBykeywords(keywords) {
+    return window.axiosInstance({
+        method: 'get',
+        url: '/search',
+        params: {
+            keywords
+        }
+    })
+}
+export function getSearchResult(keywords) {
+    return window.axios.all([getSearcSuggest(keywords), getSearcBykeywords(keywords)]).then(window.axios.spread((one, two) => {
+        let obj = {}
+        obj.singers = one.data.result.artists;
+        obj.songSheet = one.data.result.playlists;
+        obj.songList = two.data.result.songs
+        return obj
+    }))
+}
+
+
+
+
+
+
+
+
 

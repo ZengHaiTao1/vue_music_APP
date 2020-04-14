@@ -28,7 +28,9 @@ const axiosInstance = axios.create({
     baseURL: "/api"
     // baseURL: "/m-api"
 });
-window.axiosInstance = axiosInstance
+window.axiosInstance = axiosInstance  //挂载axios实例对象
+window.axios = axios  //使用axios静态方法
+
 new Vue({
     router,
     store,
