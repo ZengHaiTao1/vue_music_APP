@@ -103,6 +103,7 @@ export default {
 <style scoped lang="scss">
 .Progressbar {
     display: flex;
+    flex: 1;
     .currentTime {
         flex: 1;
         text-align: right;

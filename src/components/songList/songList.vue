@@ -9,34 +9,12 @@
                 </span>
             </div>
         </div>
-        <ul>
-            <!-- <li class="list-wapper">
-                <div class="index">
-                    <span>1</span>
-                </div>
-                <div class="info">
-                    <div>多想在平庸的生活拥抱你</div>
-                    <div class="name">隔壁老樊 - 我曾</div>
-                </div>
-            </li>-->
-            <template v-for="(item,index) in List">
-                <li class="list-wapper" :key="index" @click="play(index)">
-                    <div class="index">
-                        <span>{{index+1}}</span>
-                    </div>
-                    <div class="info">
-                        <div>{{item.songName}}</div>
-                        <div class="name">{{item["name"]}} - {{item.al}}</div>
-                    </div>
-                </li>
-            </template>
-        </ul>
+        <Listview @clickOne="clickOne" :data="List"></Listview>
     </div>
 </template>
-
 <script>
-import { mapGetters } from "vuex";
-import { mapMutations } from "vuex";
+import { mapMutations, mapGetters, mapActions } from "vuex";
+import Listview from "@/components/list-view/list-view";
 export default {
     data() {
         return {};
@@ -45,13 +23,16 @@ export default {
         this.List = [];
     },
     props: ["songList"],
+    components: {
+        Listview
+    },
     computed: {
         // 使用对象展开运算符将 getter 混入 computed 对象中
-        ...mapGetters("songPlayer", ["singer"])
+        ...mapGetters("songPlayer", ["singer", "playlist"])
     },
     watch: {
         songList() {
-            console.log(this.songList);
+            // console.log(this.songList);
             let arr = [];
             this.songList.forEach(cur => {
                 let obj = {};
@@ -61,10 +42,13 @@ export default {
                 obj.songUrl = `https://music.163.com/song/media/outer/url?id=${cur.id}.mp3 `;
                 obj.imgSrc = cur.al.picUrl;
                 obj.id = cur.id;
+
+                obj.title = obj.songName;
+                obj.describe = `${obj.name} - ${obj.al}`;
                 arr.push(obj);
                 this.List = arr;
             });
-            console.log(arr);
+            // console.log(arr);
         }
     },
     methods: {
@@ -73,10 +57,13 @@ export default {
             "setFullScreen",
             "setCurrentIndex"
         ]),
-        play(index) {
-            this.setPlaylist(this.List); //添加播放列表
+        ...mapActions("songPlayer", ["addSong"]),
+        clickOne(item) {
+            if (this.playlist.length === 0) {
+                this.setPlaylist(this.List.slice()); //添加播放列表
+            }
             this.setFullScreen(true); //全屏播放
-            this.setCurrentIndex(index);
+            this.addSong(item);
         }
     },
     mounted() {}
@@ -89,29 +76,6 @@ export default {
     height: auto;
     border-radius: 10px;
     box-sizing: border-box;
-    .list-wapper {
-        display: flex;
-        .info {
-            width: 70%;
-            padding: 10px 5px;
-            border-bottom: 1px solid rgb(228, 228, 228);
-            flex: 5;
-            div {
-                margin-left: 10px;
-            }
-            .name {
-                margin-top: 8px;
-                font-size: 14px;
-                color: rgb(143, 139, 139);
-            }
-        }
-        .index {
-            display: flex;
-            flex: 1;
-            align-items: center;
-            justify-content: center;
-        }
-    }
     .top {
         box-sizing: border-box;
         margin-left: 10px;

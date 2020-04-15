@@ -69,6 +69,9 @@ export default {
             }
         },
         getLyric() {
+            if (!this.currenSong) {
+                return;
+            }
             getLyric(this.currenSong.id)
                 .then(lyric => {
                     this.currentLyric = new Lyric(

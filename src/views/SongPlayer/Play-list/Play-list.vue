@@ -3,12 +3,12 @@
         <div class="Play-list" v-show="show" @click.stop="closePlayList">
             <div class="list-wapper" ref="list-wapper" @click.stop>
                 <div class="top">
-                    <div class="top-left">
-                        <span class="iconfont icon-sort"></span>
-                        <span class="title">列表循环({{listLength}})</span>
+                    <div class="top-left" @click="changeIcon">
+                        <span class="iconfont" :class="iconClass"></span>
+                        <span class="title">{{modeText}}({{listLength}})</span>
                     </div>
                     <div class="top-right">
-                        <span class="iconfont icon-shanchu1"></span>
+                        <span class="iconfont icon-shanchu1" @click="clearAll"></span>
                     </div>
                 </div>
                 <scroll :data="playlist" class="content" ref="scroll">
@@ -23,8 +23,11 @@
                                     <span class="songName">{{item.songName}}</span>
                                     <span class="autor">&nbsp;-&nbsp;{{item.name}}</span>
                                 </div>
-                                <div class="delete" @click.stop="delet(item.id)">
-                                    <span class="iconfont icon-shanchu"></span>
+                                <div class="delete">
+                                    <span
+                                        class="iconfont icon-shanchu"
+                                        @click.stop="delet(item.id)"
+                                    ></span>
                                 </div>
                             </li>
                         </template>
@@ -43,14 +46,18 @@ const animation = prefixStyle("animation");
 const transition = prefixStyle("transition");
 import scroll from "@/components/scroll/scroll";
 import { mapGetters, mapActions } from "vuex";
+import playMixin from "@/mixin/play";
 export default {
+    mixins: [playMixin],
     data() {
         return {
-            listLength: 0
+            listLength: 0,
+            iconClass: "icon-sort"
         };
     },
+    created() {},
     methods: {
-        ...mapActions("songPlayer", ["deleteById", "addSong"]),
+        ...mapActions("songPlayer", ["deleteById", "addSong", "clearSongList"]),
         closePlayList() {
             this.$parent.setShow(false);
         },
@@ -90,14 +97,17 @@ export default {
             this.$refs["list-wapper"].style[transform] = "";
         },
         delet(id) {
-            console.log(id);
+            // console.log(id);
             this.deleteById(id);
         },
         scrollToCurrent() {
+            if (!this.show) {
+                return;
+            }
             const index = this.playlist.findIndex(song => {
                 return this.currenSong.id === song.id;
             });
-            console.log(index);
+            // console.log(index);
             this.$refs.scroll.scrollToElement(
                 this.$refs.list.children[index <= 3 ? index : index - 3],
                 300
@@ -109,11 +119,38 @@ export default {
                 this.$refs.scroll.refresh();
                 this.scrollToCurrent();
             });
+        },
+        clearAll() {
+            this.$popup({
+                title: "确定要清空播放播放列表?",
+                btnOkFn: () => {
+                    console.log("确定");
+                    this.clearSongList();
+                }
+            });
         }
     },
     props: ["show"],
     computed: {
-        ...mapGetters("songPlayer", ["playlist", "currenSong"])
+        ...mapGetters("songPlayer", ["playlist", "currenSong"]),
+        modeText() {
+            let text = "";
+            switch (this.iconClass) {
+                case "icon-sort": {
+                    text = "列表循环";
+                    break;
+                }
+                case "icon-danquxunhuan": {
+                    text = "单曲循环";
+                    break;
+                }
+                case "icon-bofangye-caozuolan-suijibofang": {
+                    text = "随机播放";
+                    break;
+                }
+            }
+            return text;
+        }
     },
     watch: {
         show(newval) {
@@ -124,7 +161,6 @@ export default {
                 });
             }
             this.listLength = this.playlist.length;
-            console.log(this.listLength);
         }
     },
     components: {
@@ -151,6 +187,7 @@ export default {
         height: 65%;
         border-radius: 5% 5% 0px 0px;
         animation-fill-mode: forwards;
+        box-sizing: border-box;
         .top {
             padding: 10px;
             display: flex;
@@ -177,10 +214,10 @@ export default {
         }
         .content {
             height: 90%;
-            padding: 10px;
             overflow: hidden;
             box-sizing: border-box;
             ul {
+                padding: 10px;
                 .list {
                     display: flex;
                     padding: 10px 0;

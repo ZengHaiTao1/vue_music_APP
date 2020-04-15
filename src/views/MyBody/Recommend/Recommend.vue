@@ -46,10 +46,16 @@ export default {
             this.$refs.scroll.refresh();
         },
         changScroll() {
-            if (this.fullScreen !== "") {
+            if (this.fullScreen !== "" && this.currenSong) {
                 this.$refs.Recommend.style.bottom = "70px";
                 this.$refs.scroll.refresh();
+            } else {
+                this.$refs.Recommend.style.bottom = "";
+                this.$refs.scroll.refresh();
             }
+        },
+        activated() {
+            this.$refs.scroll.refresh();
         }
     },
     components: {

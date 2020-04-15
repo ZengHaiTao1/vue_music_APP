@@ -3,18 +3,9 @@
         <scroll class="scroll" ref="scroll">
             <div class="Rank">
                 <h1>排行榜</h1>
-                <div class="song-list clearfix">
-                    <template v-for="(item,index) in rankList">
-                        <a class="list-item" :key="index" @click="chang(item.id)">
-                            <div class="img">
-                                <img class="u-img" v-lazy="item.coverImgUrl" />
-                                <span
-                                    class="iconfont icon-erji"
-                                >&nbsp;&nbsp;{{item.updateFrequency}}</span>
-                            </div>
-                            <div class="remd-text">{{item.name}}</div>
-                        </a>
-                    </template>
+                <SongSheetList v-show="rankList.length>0" :data="rankList" @clickOne="clickOne"></SongSheetList>
+                <div v-show="!rankList.length" class="load-wapper">
+                    <loading></loading>
                 </div>
             </div>
         </scroll>
@@ -30,6 +21,8 @@
 import { getToplist } from "@/http/recommend-http.js";
 import scroll from "@/components/scroll/scroll";
 import bottomMixin from "@/mixin/bottomPlay";
+import SongSheetList from "@/components/songSheet-list/songSheet-list";
+import loading from "@/components/loading/MyLoading";
 export default {
     mixins: [bottomMixin],
     data() {
@@ -38,15 +31,22 @@ export default {
         };
     },
     methods: {
-        chang(id) {
+        clickOne(item) {
             this.$router.push({
-                path: `/rank/${id}`
+                path: `/rank/${item.id}`
             });
         },
         changScroll() {
-            if (this.fullScreen !== "") {
-                console.log(this.$refs.scroll);
+            console.log(1);
+            if (this.fullScreen !== "" && this.currenSong) {
+                console.log(2);
+                console.log(this.currenSong);
+                // console.log(this.$refs.scroll);
                 this.$refs.scroll.$el.style.bottom = "70px";
+                this.$refs.scroll.refresh();
+            } else {
+                console.log(3);
+                this.$refs.scroll.$el.style.bottom = "";
                 this.$refs.scroll.refresh();
             }
         }
@@ -54,12 +54,23 @@ export default {
     mounted() {
         getToplist().then(res => {
             console.log(res.data.list);
+            res.data.list.forEach(cur => {
+                cur.bottomText = cur.name;
+                cur.rightText = cur.updateFrequency;
+            });
             this.rankList = res.data.list;
+            console.log(this.rankList);
         });
         this.changScroll();
     },
     components: {
-        scroll
+        scroll,
+        SongSheetList,
+        loading
+    },
+    activated() {
+        this.changScroll();
+        this.$refs.scroll.refresh();
     }
 };
 </script>
@@ -86,54 +97,6 @@ export default {
                 width: 2px;
                 height: 16px;
                 background-color: #d33a31;
-            }
-        }
-        .song-list {
-            .list-item {
-                display: block;
-                margin-bottom: 16px;
-                float: left;
-                width: 33.3%;
-                padding-left: 1px;
-                padding-right: 1px;
-                box-sizing: border-box;
-                .remd-text {
-                    padding: 6px 2px 0 6px;
-                    min-height: 40px;
-                    line-height: 1;
-                    font-size: 13px;
-                    overflow: hidden;
-                    text-overflow: ellipsis;
-                    display: -webkit-box;
-                    -webkit-line-clamp: 3;
-                    -webkit-box-orient: vertical;
-                }
-                .img {
-                    position: relative;
-                    padding-bottom: 100%;
-                    img {
-                        position: absolute;
-                        width: 100%;
-                        left: 0;
-                        top: 0;
-                        z-index: 1;
-                        vertical-align: middle;
-                        border: 0;
-                    }
-                    .iconfont {
-                        position: absolute;
-                        right: 5px;
-                        top: 2px;
-                        z-index: 3;
-                        padding-left: 13px;
-                        color: #fff;
-                        font-size: 12px;
-                        background-position: 0;
-                        background-repeat: no-repeat;
-                        background-size: 11px 10px;
-                        text-shadow: 1px 0 0 rgba(0, 0, 0, 0.15);
-                    }
-                }
             }
         }
     }

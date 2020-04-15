@@ -6,6 +6,48 @@
   "description": "",
   "glyphs": [
     {
+      "icon_id": "4757718",
+      "name": "播放",
+      "font_class": "bofang1",
+      "unicode": "e606",
+      "unicode_decimal": 58886
+    },
+    {
+      "icon_id": "5325156",
+      "name": "暂停",
+      "font_class": "zanting1",
+      "unicode": "e890",
+      "unicode_decimal": 59536
+    },
+    {
+      "icon_id": "5308512",
+      "name": "下一首",
+      "font_class": "xiayishou",
+      "unicode": "e688",
+      "unicode_decimal": 59016
+    },
+    {
+      "icon_id": "5308523",
+      "name": "上一首",
+      "font_class": "shangyishou",
+      "unicode": "e689",
+      "unicode_decimal": 59017
+    },
+    {
+      "icon_id": "5961049",
+      "name": "暂停按钮",
+      "font_class": "zantinganniu",
+      "unicode": "e60e",
+      "unicode_decimal": 58894
+    },
+    {
+      "icon_id": "11862442",
+      "name": "直播播放按钮",
+      "font_class": "zhibobofanganniu",
+      "unicode": "e604",
+      "unicode_decimal": 58884
+    },
+    {
       "icon_id": "6857566",
       "name": "音量",
       "font_class": "ziyuanldpi",

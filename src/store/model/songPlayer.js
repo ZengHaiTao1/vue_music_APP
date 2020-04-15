@@ -14,7 +14,10 @@ const getters = {
     currenSong: state => {
         return state.playlist[state.currentIndex]
     },
-    mode: state => state.mode
+    mode: state => state.mode,
+    isEmpty: state => {
+        return state.playlist.length === 0
+    },
 }
 const mutations = {
     setPlaying(state, value) {
@@ -57,6 +60,13 @@ const mutations = {
         })
         state.playlist.splice(index, 1)
     },
+    clearSongList(state) {
+        state.fullScreen = false
+        state.mode = "order"
+        state.playing = false
+        state.playlist.length = 0
+        state.currentIndex = -1
+    }
 }
 const actions = {
     addSong({ commit }, data) {
@@ -64,7 +74,10 @@ const actions = {
     },
     deleteById({ commit }, data) {
         commit('deleteById', data)
-    }
+    },
+    clearSongList({ commit }) {
+        commit('clearSongList')
+    },
 
 }
 const songPlayer = {

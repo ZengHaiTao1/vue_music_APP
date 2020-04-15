@@ -2,7 +2,7 @@
     <div class="list-view">
         <ul>
             <template v-for="(item,index) in data">
-                <li class="list-wapper" :key="index" @click="clickOne(index)">
+                <li class="list-wapper" :key="index" @click="clickOne(item)">
                     <div class="index">
                         <span>{{index+1}}</span>
                     </div>

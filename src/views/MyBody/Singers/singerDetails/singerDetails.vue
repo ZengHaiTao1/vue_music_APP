@@ -16,19 +16,21 @@
                 :probe-type="3"
             >
                 <div>
-                    <songlist :songList="songList"></songlist>
+                    <songlist v-show="songList.length>0" :songList="songList"></songlist>
                 </div>
             </scroll>
+        </div>
+        <div v-show="!songList.length" class="load-wapper">
+            <loading></loading>
         </div>
     </div>
 </template>
 
 <script>
 import { getsingerDetails, getSongDetails } from "@/http/recommend-http.js";
+import loading from "@/components/loading/MyLoading";
 import songlist from "@/components/songList/songList";
-// import { mapMutations } from "vuex";
 import scroll from "@/components/scroll/scroll";
-// import { Song } from "@/pojo/Song";
 import { mapGetters } from "vuex";
 import { prefixStyle } from "@/utils/dom.js";
 const RESERVED_HEIGHT = 40; //定义顶部高度
@@ -63,18 +65,24 @@ export default {
             this.$router.back();
         },
         changScroll() {
-            if (this.fullScreen !== "") {
+            if (this.fullScreen !== "" && this.currenSong) {
                 this.$refs.scrollWapper.style.bottom = "70px";
+                this.$refs.scroll.refresh();
+            } else {
+                this.$refs.scrollWapper.style.bottom = "";
                 this.$refs.scroll.refresh();
             }
         }
+    },
+    activated() {
+        this.$refs.scroll.refresh();
     },
     mounted() {
         // let id = this.$route.params.id;
         this.imageHeight = this.$refs.singerImg.clientHeight; //获取图片高度
         this.$refs.scrollWapper.style.top = `${this.imageHeight - 10}px`; //设置初始top值
         this.minTransalteY = -this.imageHeight + RESERVED_HEIGHT; //获取滚到距离顶部40px的位置
-        console.log(this.$route);
+        // console.log(this.$route);
         if (this.$route.fullPath.indexOf("/singers") != -1) {
             getsingerDetails(this.id).then(res => {
                 this.name = res.data.artist.name;
@@ -86,7 +94,7 @@ export default {
             this.$route.fullPath.indexOf("/rank") != -1
         ) {
             getSongDetails(this.id).then(res => {
-                console.log(res);
+                // console.log(res);
                 this.name = res.data.playlist.name;
                 this.bgStyle = `background-image:url(${res.data.playlist.coverImgUrl}?param=400x400)`;
                 this.songList = res.data.playlist.tracks;
@@ -96,7 +104,8 @@ export default {
     },
     components: {
         songlist,
-        scroll
+        scroll,
+        loading
     },
     computed: {
         ...mapGetters("songPlayer", ["fullScreen"])
@@ -134,7 +143,17 @@ export default {
             position: absolute;
         }
     }
-
+    .load-wapper {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .top {
         top: 0;
         position: fixed;

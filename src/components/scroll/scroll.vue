@@ -44,6 +44,21 @@ export default {
         scrollY: {
             type: Boolean,
             default: true
+        },
+        bounce: {
+            type: Object,
+            default() {
+                return {
+                    top: true,
+                    bottom: true,
+                    left: true,
+                    right: true
+                };
+            }
+        },
+        scrollEnd: {
+            type: Boolean,
+            default: false
         }
     },
     mounted() {
@@ -60,7 +75,8 @@ export default {
                 probeType: this.probeType,
                 click: this.click,
                 scrollX: this.scrollX,
-                scrollY: this.scrollY
+                scrollY: this.scrollY,
+                bounce: this.bounce
             });
             // console.log(this.scroll);
             if (this.listenScroll) {
@@ -78,7 +94,12 @@ export default {
                 });
             }
 
-            if (this.beforeScroll) {
+            if (this.scrollEnd) {
+                this.scroll.on("scrollEnd", e => {
+                    this.$emit("scrollEnd", e);
+                });
+            }
+            if (this.scrollEnd) {
                 this.scroll.on("beforeScrollStart", () => {
                     this.$emit("beforeScroll");
                 });
@@ -99,6 +120,11 @@ export default {
         scrollToElement() {
             this.scroll &&
                 this.scroll.scrollToElement.apply(this.scroll, arguments);
+        },
+        isInTransition() {
+            if (this.scroll) {
+                return this.scroll.isInTransition;
+            }
         }
     },
     watch: {

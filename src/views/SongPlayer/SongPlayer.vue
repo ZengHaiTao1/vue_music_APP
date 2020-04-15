@@ -1,57 +1,59 @@
 <template>
-    <div class="SongPlayer" v-show="playlist.length>0">
-        <transition
-            name="normal"
-            @enter="enter"
-            @after-enter="afterEnter"
-            @leave="leave"
-            @after-leave="afterLeave"
-        >
-            <div class="Fullscreen" v-show="fullScreen">
-                <!--           背景部分      -->
-                <div class="background" v-if="currenSong">
-                    <img
-                        :src="currenSong.imgSrc+'?param=300x300'"
-                        width="100%"
-                        height="100%"
-                        alt="歌曲图片"
-                    />
+    <transition name="fade">
+        <div class="SongPlayer" v-show="playlist.length>0">
+            <transition
+                name="normal"
+                @enter="enter"
+                @after-enter="afterEnter"
+                @leave="leave"
+                @after-leave="afterLeave"
+            >
+                <div class="Fullscreen" v-show="fullScreen">
+                    <!--           背景部分      -->
+                    <div class="background" v-if="currenSong">
+                        <img
+                            :src="currenSong.imgSrc+'?param=300x300'"
+                            width="100%"
+                            height="100%"
+                            alt="歌曲图片"
+                        />
+                    </div>
+                    <div class="background layer"></div>
+
+                    <!--             顶部          -->
+                    <PlayerTop ref="PlayerTop"></PlayerTop>
+
+                    <!--              中部 -->
+                    <PlayerCenter ref="PlayerCenter"></PlayerCenter>
+
+                    <!--           底部           -->
+                    <PlayBottom>
+                        <Progressbar
+                            @percentChange="percentChange"
+                            :currentTime="currentTime"
+                            :duration="duration"
+                        ></Progressbar>
+                    </PlayBottom>
                 </div>
-                <div class="background layer"></div>
+            </transition>
 
-                <!--             顶部          -->
-                <PlayerTop ref="PlayerTop"></PlayerTop>
+            <!-------    mini播放器部分   ------>
+            <PlayerMini @setShow="setShow"></PlayerMini>
 
-                <!--              中部 -->
-                <PlayerCenter ref="PlayerCenter"></PlayerCenter>
+            <!--播放列表  -->
+            <PlayList :show="showPlaylist" @setShow="setShow"></PlayList>
 
-                <!--           底部           -->
-                <PlayBottom>
-                    <Progressbar
-                        @percentChange="percentChange"
-                        :currentTime="currentTime"
-                        :duration="duration"
-                    ></Progressbar>
-                </PlayBottom>
-            </div>
-        </transition>
-
-        <!-------    mini播放器部分   ------>
-        <PlayerMini @setShow="setShow"></PlayerMini>
-
-        <!--播放列表  -->
-        <PlayList :show="showPlaylist" @setShow="setShow"></PlayList>
-
-        <audio
-            v-if="currenSong"
-            @play="ready"
-            @error="error"
-            @timeupdate="updateTime"
-            :src="currenSong.songUrl"
-            autoplay
-            ref="audio"
-        ></audio>
-    </div>
+            <audio
+                v-if="currenSong"
+                @play="ready"
+                @error="error"
+                @timeupdate="updateTime"
+                :src="currenSong.songUrl"
+                autoplay
+                ref="audio"
+            ></audio>
+        </div>
+    </transition>
 </template>
 
 <script>
@@ -107,6 +109,9 @@ export default {
             };
         },
         enter(el, done) {
+            if (this.playlist.length === 0) {
+                return;
+            }
             const { x, y, scale } = this._getPosAndScale();
             let animation = {
                 //定义transform
@@ -167,6 +172,22 @@ export default {
             }
             this.$refs.PlayerCenter.togglePlaying();
         },
+        prev() {
+            if (!this.songReady) {
+                return;
+            }
+            this.$refs.PlayerCenter.$refs.needle.classList.add("pause");
+            this.songReady = true;
+            let index = this.currentIndex - 1;
+            if (this.mode === "random") {
+                index = this.getRandomInt(0, this.playlist.length);
+            } else if (index === -1) {
+                index = this.playlist.length - 1;
+            }
+            this.setCurrentIndex(index);
+            this.$refs.PlayerCenter.$refs.imgRot.style[transform] =
+                "rotate(0deg)";
+        },
         next() {
             if (!this.songReady) {
                 return;
@@ -200,24 +221,13 @@ export default {
         },
         error() {
             this.songReady = true;
-            // this.next();
-        },
-        prev() {
-            if (!this.songReady) {
-                return;
-            }
-            this.songReady = true;
-            let index = this.currentIndex - 1;
-            if (this.mode === "random") {
-                index = this.getRandomInt(0, this.playlist.length);
-            } else if (index === -1) {
-                index = this.playlist.length - 1;
-            }
-            this.setCurrentIndex(index);
-            this.$refs.PlayerCenter.$refs.imgRot.style[transform] =
-                "rotate(0deg)";
+            this.next();
+            alert("该歌曲没有版权或者是会员歌曲，请切换");
         },
         updateTime(e) {
+            if (!this.currenSong) {
+                return;
+            }
             this.currentTime = e.target.currentTime;
             if (this.currentTime >= this.$refs.audio.duration) {
                 if (this.mode === "loop") {
@@ -251,6 +261,9 @@ export default {
     mounted() {},
     watch: {
         currenSong(newSong, oldSong) {
+            if (!newSong) {
+                this.setShow(false);
+            }
             if (newSong == oldSong) {
                 return;
             }
@@ -312,5 +325,15 @@ export default {
             }
         }
     }
+}
+.fade-enter-active,
+.fade-leave-active {
+    transition: all 0.5s;
+}
+.fade-leave-to {
+    opacity: 0;
+}
+.fade-enter-to {
+    opacity: 1;
 }
 </style>

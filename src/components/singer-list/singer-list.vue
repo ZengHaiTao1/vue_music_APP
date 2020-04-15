@@ -2,15 +2,16 @@
     <div class="singer-list">
         <ul>
             <template v-for="(item,index) in data">
-                <li class="list-wapper" :key="index" @click="clickOne(index)">
+                <li class="list-wapper" :key="index" @click="clickOne(item)">
                     <div class="img">
-                        <img :src="item.picUrl+'?param=200x200'" />
+                        <img v-lazy="item.picUrl+'?param=200x200'" />
                     </div>
                     <div class="title">
                         <span class="singName">{{item.name}}</span>
                     </div>
                 </li>
             </template>
+            <slot></slot>
         </ul>
     </div>
 </template>
@@ -26,20 +27,33 @@ export default {
             this.$emit("clickOne", index);
         }
     },
-    props: ["data"]
+    props: {
+        data: {
+            type: Array,
+            default() {
+                return { picUrl: "", name: "" };
+            }
+        }
+    }
 };
 </script>
 
 <style scoped lang="scss">
 .singer-list {
     padding: 10px;
+    box-sizing: border-box;
     ul {
         .list-wapper {
             display: flex;
-            min-height: 40px;
+            align-items: center;
+            min-height: 60px;
             border-bottom: 1px solid rgb(228, 228, 228);
             .img {
+                min-height: 60px;
                 flex: 1;
+                height: 60px;
+                display: flex;
+                align-items: center;
                 img {
                     width: 100%;
                     height: auto;

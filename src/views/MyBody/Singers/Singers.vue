@@ -10,24 +10,17 @@
                 :pullup="true"
                 @scrollToEnd="scrollToEnd"
             >
-                <div>
-                    <template v-if="SingerList.length">
-                        <div
-                            v-for="(item,index) in SingerList"
-                            class="img-wapper"
-                            :key="index"
-                            @click="gotoDetails(item.id)"
-                        >
-                            <img v-lazy="item.img1v1Url+'?param=200x200'" />
-                            <span>
-                                <span class="imgTitle">{{item.name}}</span>
-                            </span>
-                        </div>
-                    </template>
-                </div>
+                <SingerList @clickOne="clickOne" :data="SingerList">
+                    <div class="loadWapper" v-show="more&&SingerList.length>0">
+                        <loading></loading>
+                    </div>
+                </SingerList>
             </scroll>
         </div>
-        <loading v-show="!SingerList.length"></loading>
+        <div class="load-wapper" v-show="!SingerList.length">
+            <loading></loading>
+        </div>
+
         <keep-alive>
             <transition name="slide" mode="out-in">
                 <router-view :key="$route.path"></router-view>
@@ -40,7 +33,8 @@
 import { getSingers } from "@/http/recommend-http.js";
 import scrollNav from "@/components/scrollNav/scrollNav";
 import scroll from "@/components/scroll/scroll";
-import loading from "@/components/loading/loading";
+import loading from "@/components/loading/MyLoading";
+import SingerList from "@/components/singer-list/singer-list";
 
 import bottomMixin from "@/mixin/bottomPlay";
 export default {
@@ -111,7 +105,8 @@ export default {
                 "Y",
                 "Z"
             ],
-            page: 1
+            page: 1,
+            more: true
         };
     },
 
@@ -131,19 +126,32 @@ export default {
             this.nowIni = this.IniList[index];
         },
         getData(offset) {
+            if (!this.more) {
+                return;
+            }
             getSingers(this.nowcat, this.nowIni, offset).then(res => {
+                console.log(res);
+                if (res.data.more === false) {
+                    this.more = false;
+                }
                 if (res.status == "200") {
                     if (res.data.artists.length === 0) {
                         return;
                     }
                     if (offset) {
                         res.data.artists.forEach(cur => {
+                            cur.picUrl = cur.img1v1Url;
                             this.SingerList.push(cur);
                         });
-                        // console.log(this.SingerList);
+                        this.$nextTick(() => {
+                            this.$refs.scroll.refresh();
+                        });
                         return;
                     }
                     this.SingerList = res.data.artists;
+                    this.$nextTick(() => {
+                        this.$refs.scroll.refresh();
+                    });
                 }
             });
         },
@@ -151,18 +159,25 @@ export default {
             this.getData(this.page * 10);
             this.page++;
         },
-        gotoDetails(id) {
+        clickOne(item) {
             //去歌手详情页面
-            this.$router.push({ path: "/singers/" + id });
+            this.$router.push({ path: "/singers/" + item.id });
         },
         changScroll() {
-            if (this.fullScreen !== "") {
-                console.log(this.$refs.scrollWapper);
+            if (this.fullScreen !== "" && this.currenSong) {
                 this.$nextTick(() => {
                     this.$refs.scrollWapper.style.bottom = "70px";
                     this.$refs.scroll.refresh();
                 });
+            } else {
+                this.$nextTick(() => {
+                    this.$refs.scrollWapper.style.bottom = "";
+                    this.$refs.scroll.refresh();
+                });
             }
+        },
+        activated() {
+            this.$refs.scroll.refresh();
         }
     },
     mounted() {
@@ -172,16 +187,21 @@ export default {
     components: {
         scrollNav,
         scroll,
-        loading
+        loading,
+        SingerList
     },
     watch: {
         nowcat() {
+            this.SingerList = [];
             this.page = 1; //当条件改变时，重置page
+            this.more = true;
             this.getData();
             this.$refs.scroll.scrollTo(0, 0, 200);
         },
         nowIni() {
+            this.SingerList = [];
             this.page = 1;
+            this.more = true;
             this.getData();
             this.$refs.scroll.scrollTo(0, 0, 200);
         }
@@ -203,24 +223,18 @@ export default {
             height: 100%;
             overflow: hidden;
             position: relative;
-            .img-wapper {
-                display: flex;
-                border-bottom: 1px solid rgb(228, 228, 228);
-                img {
-                    flex: 1;
-                    width: 60px;
-                    height: 60px;
-                    border-radius: 3px;
-                }
-                span {
-                    flex: 4;
-                    line-height: 60px;
-                    .imgTitle {
-                        margin-left: 20px;
-                    }
-                }
-            }
         }
+    }
+    .load-wapper {
+        position: fixed;
+        top: 165px;
+        left: 0px;
+        bottom: 0px;
+        width: 100%;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 .slide-enter-active,

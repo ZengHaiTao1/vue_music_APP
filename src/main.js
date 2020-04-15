@@ -21,6 +21,9 @@ Vue.use(VueLazyLoad, {
 
 Vue.prototype.$publicPath = process.env.BASE_URL
 
+import Popup from '@/components/popup/popup'
+Vue.prototype.$popup = Popup.install
+
 //导入axios
 import axios from 'axios';
 const axiosInstance = axios.create({

@@ -15,7 +15,7 @@
                 <div class="History" v-show="searchHistory.length>0">
                     <div class="History-title">
                         <span class="left">历史记录</span>
-                        <span class="right iconfont icon-shanchu1" @click="clear"></span>
+                        <span class="right iconfont icon-shanchu1" @click="clearAllHistory"></span>
                     </div>
 
                     <div class="History-list">
@@ -39,15 +39,23 @@
                 <div class="searchHot">
                     <h1 class="title">热搜榜</h1>
                     <scroll class="scroll" ref="scroll">
-                        <ListView @clickOne="clickSearchHot" class="list" :data="searchHotList"></ListView>
+                        <ListView
+                            @clickOne="clickSearchHot"
+                            class="list"
+                            v-show="searchHotList.length>0"
+                            :data="searchHotList"
+                        ></ListView>
                     </scroll>
+                    <div class="load-wapper" v-show="!searchHotList.length">
+                        <loading></loading>
+                    </div>
                 </div>
             </div>
 
             <scroll
                 :data="dataChange"
                 class="ResultScroll"
-                v-show="searchText!==''&&!searching"
+                v-show="searchText!==''&&singers.length>0"
                 ref="ResultScroll"
             >
                 <div class="ResultWapper">
@@ -65,6 +73,9 @@
                     </div>
                 </div>
             </scroll>
+            <div class="loadWapper" v-show="!singers.length&&searchText!==''">
+                <loading></loading>
+            </div>
         </div>
     </transition>
 </template>
@@ -77,7 +88,7 @@ import { mapGetters } from "vuex";
 import { mapActions } from "vuex";
 import SingerList from "@/components/singer-list/singer-list";
 import bottomMixins from "@/mixin/bottomPlay";
-
+import loading from "@/components/loading/MyLoading";
 export default {
     mixins: [bottomMixins],
     data() {
@@ -87,7 +98,6 @@ export default {
             singers: [], //歌手列表
             songSheet: [], //歌单列表
             songList: [], //歌曲列表
-            searching: false, //是否正在搜索,
             HistoryText: "" //对搜索进行缓存
         };
     },
@@ -104,6 +114,15 @@ export default {
             this.searchText = "";
             this.focus();
         },
+        clearAllHistory() {
+            this.$popup({
+                title: "确定要删除所有历史记录?",
+                btnOkFn: () => {
+                    console.log("确定");
+                    this.clear();
+                }
+            });
+        },
         focus() {
             this.$refs.inputs.focus();
         },
@@ -114,8 +133,8 @@ export default {
                 this.searchText = "";
             }
         },
-        clickSearchHot(index) {
-            let title = this.searchHotList[index].title;
+        clickSearchHot(item) {
+            let title = item.title;
             this.changeSearchText(title);
         },
         changeSearchText(value) {
@@ -124,7 +143,7 @@ export default {
         },
         changBottom() {
             if (this.searchHistory.length > 0) {
-                if (this.fullScreen !== "") {
+                if (this.fullScreen !== "" && this.currenSong) {
                     this.$refs.scroll.$el.style.height = "calc(80% - 80px)";
                     this.$refs.scroll.refresh();
                     return;
@@ -132,7 +151,7 @@ export default {
                 this.$refs.scroll.$el.style.height = "80%";
                 this.$refs.scroll.refresh();
             } else {
-                if (this.fullScreen !== "") {
+                if (this.fullScreen !== "" && this.currenSong) {
                     this.$refs.scroll.$el.style.height = "calc(93% - 60px)";
                     this.$refs.scroll.refresh();
                     return;
@@ -141,8 +160,7 @@ export default {
                 this.$refs.scroll.refresh();
             }
         },
-        clickSong(index) {
-            let song = this.songList[index];
+        clickSong(song) {
             let obj = {};
             obj.songUrl = `https://music.163.com/song/media/outer/url?id=${song.id}.mp3 `;
             obj.name = song.describe.split("-")[0];
@@ -151,24 +169,19 @@ export default {
             obj.id = song.id;
             this.addSong(obj);
         },
-        clickSinger(index) {
-            let singer = this.singers[index];
-            console.log(this.singers[index]);
+        clickSinger(singer) {
             this.$router.push({
                 path: `/singers/${singer.id}`
             });
         },
-        clickSongSheet(index) {
-            let SongSheet = this.songSheet[index];
-            console.log(SongSheet);
+        clickSongSheet(SongSheet) {
             this.$router.push({
                 path: `/recommend/${SongSheet.id}`
             });
         },
         changScroll() {
             this.changBottom();
-            if (this.fullScreen !== "") {
-                console.log(123);
+            if (this.fullScreen !== "" && this.currenSong) {
                 this.$refs.ResultScroll.$el.style.height = "calc(93% - 70px)";
                 this.$refs.ResultScroll.refresh();
             } else {
@@ -232,12 +245,17 @@ export default {
             });
             // console.log(this.searchHotList);
         });
-        this.changBottom();
+        this.changScroll();
+    },
+    activated() {
+        this.$refs.ResultScroll.refresh();
+        this.$refs.scroll.refresh();
     },
     components: {
         ListView,
         scroll,
-        SingerList
+        SingerList,
+        loading
     },
     watch: {
         searchHistory() {
@@ -292,6 +310,18 @@ export default {
     width: 100%;
     height: 100%;
     background: rgb(242, 243, 244);
+    .loadWapper {
+        position: fixed;
+        top: 7%;
+        width: 100%;
+        height: 93%;
+        overflow: hidden;
+        left: 0;
+        box-sizing: border-box;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
     .ResultScroll {
         position: fixed;
         top: 7%;
@@ -346,6 +376,17 @@ export default {
                     top: 0;
                     width: 100%;
                 }
+            }
+            .load-wapper {
+                position: absolute;
+                left: 0;
+                width: 100%;
+                height: 93%;
+                top: 0;
+                overflow: hidden;
+                display: flex;
+                justify-content: center;
+                align-items: center;
             }
         }
         .History {

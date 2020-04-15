@@ -4,14 +4,14 @@
             <slot></slot>
         </div>
         <div class="btnList">
-            <span class="iconfont" @click="change" :class="iconClass"></span>
-            <span class="iconfont icon-houtui" @click="prev"></span>
+            <span class="iconfont" @click="changeIcon" :class="iconClass"></span>
+            <span class="iconfont icon-shangyishou" @click="prev"></span>
             <span
                 class="iconfont"
-                :class="!playing?'icon-weibiaoti--2':'icon-zanting'"
+                :class="!playing?'icon-bofang1':'icon-zanting1'"
                 @click.prevent.stop="toggerPlay"
             ></span>
-            <span class="iconfont icon-qianjin" @click="next"></span>
+            <span class="iconfont icon-xiayishou" @click="next"></span>
             <span class="iconfont icon-A_-bofangliebiao" @click="setShow"></span>
         </div>
     </div>
@@ -36,44 +36,9 @@ export default {
         toggerPlay() {
             this.$parent.toggerPlay();
         },
-        change() {
-            switch (this.mode) {
-                case "order": {
-                    this.setMode("loop");
-                    break;
-                }
-                case "loop": {
-                    this.setMode("random");
-                    break;
-                }
-                case "random": {
-                    this.setMode("order");
-                    break;
-                }
-            }
-            console.log(this.mode);
-            console.log(this.iconClass);
-        },
+
         setShow() {
             this.$parent.setShow(true);
-        }
-    },
-    watch: {
-        mode() {
-            switch (this.mode) {
-                case "order": {
-                    this.iconClass = "icon-sort";
-                    break;
-                }
-                case "loop": {
-                    this.iconClass = "icon-danquxunhuan";
-                    break;
-                }
-                case "random": {
-                    this.iconClass = "icon-bofangye-caozuolan-suijibofang";
-                    break;
-                }
-            }
         }
     }
 };
@@ -90,6 +55,7 @@ export default {
         height: 10vh;
         display: flex;
         justify-content: center;
+        align-items: center;
         span {
             flex: 1;
             text-align: center;
@@ -97,9 +63,12 @@ export default {
         }
     }
     .Progressbar-wapper {
-        margin-top: 5vh;
+        // margin-top: 5vh;
         bottom: 5vh;
         height: 10vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
     }
 }
 </style>
