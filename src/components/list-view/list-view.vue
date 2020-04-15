@@ -62,6 +62,7 @@ export default {
     .list-wapper {
         display: flex;
         border-bottom: 1px solid rgb(228, 228, 228);
+        box-sizing: border-box;
         .info {
             padding: 10px 5px;
             flex: 7;

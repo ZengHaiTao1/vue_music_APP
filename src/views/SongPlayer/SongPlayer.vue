@@ -37,7 +37,10 @@
         </transition>
 
         <!-------    mini播放器部分   ------>
-        <PlayerMini></PlayerMini>
+        <PlayerMini @setShow="setShow"></PlayerMini>
+
+        <!--播放列表  -->
+        <PlayList :show="showPlaylist" @setShow="setShow"></PlayList>
 
         <audio
             v-if="currenSong"
@@ -62,17 +65,22 @@ import PlayerTop from "@/views/SongPlayer/PlayerTop/PlayerTop";
 import PlayerCenter from "@/views/SongPlayer/PlayerCenter/PlayerCenter";
 import PlayerMini from "@/views/SongPlayer/PlayerMini/PlayerMini";
 import PlayBottom from "@/views/SongPlayer/PlayBottom/PlayBottom";
+import PlayList from "@/views/SongPlayer/Play-list/Play-list";
 
 export default {
     mixins: [playMixin],
     data() {
         return {
             songReady: false,
-            currentTime: "",
-            duration: ""
+            currentTime: "", //当前事件
+            duration: "", //歌曲时长
+            showPlaylist: false //控制播放列表显示
         };
     },
     methods: {
+        setShow(value) {
+            this.showPlaylist = value;
+        },
         getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min + 1)) + min;
         },
@@ -254,7 +262,8 @@ export default {
         PlayerTop,
         PlayerCenter,
         PlayerMini,
-        PlayBottom
+        PlayBottom,
+        PlayList
     }
 };
 </script>

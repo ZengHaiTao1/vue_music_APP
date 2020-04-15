@@ -50,11 +50,20 @@ const mutations = {
         }
         state.fullScreen = true
         console.log(state.playlist)
-    }
+    },
+    deleteById(state, id) {
+        let index = state.playlist.findIndex((cur) => {
+            return cur.id === id
+        })
+        state.playlist.splice(index, 1)
+    },
 }
 const actions = {
     addSong({ commit }, data) {
         commit('addSong', data)
+    },
+    deleteById({ commit }, data) {
+        commit('deleteById', data)
     }
 
 }

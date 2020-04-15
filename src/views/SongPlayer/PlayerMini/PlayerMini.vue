@@ -21,7 +21,7 @@
                     :class="!playing?'icon-weibiaoti--2':'icon-zanting'"
                 ></span>
             </div>
-            <div class="openList">
+            <div class="openList" @click.stop="setShow">
                 <span class="iconfont icon-A_-bofangliebiao"></span>
             </div>
         </div>
@@ -41,6 +41,9 @@ export default {
         },
         toggerPlay() {
             this.$parent.toggerPlay();
+        },
+        setShow() {
+            this.$parent.setShow(true);
         }
     }
 };

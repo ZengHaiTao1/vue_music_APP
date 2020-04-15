@@ -76,7 +76,10 @@ import scroll from "@/components/scroll/scroll";
 import { mapGetters } from "vuex";
 import { mapActions } from "vuex";
 import SingerList from "@/components/singer-list/singer-list";
+import bottomMixins from "@/mixin/bottomPlay";
+
 export default {
+    mixins: [bottomMixins],
     data() {
         return {
             searchText: "", //搜索框
@@ -84,7 +87,8 @@ export default {
             singers: [], //歌手列表
             songSheet: [], //歌单列表
             songList: [], //歌曲列表
-            searching: false //是否正在搜索
+            searching: false, //是否正在搜索,
+            HistoryText: "" //对搜索进行缓存
         };
     },
     computed: {
@@ -120,9 +124,19 @@ export default {
         },
         changBottom() {
             if (this.searchHistory.length > 0) {
+                if (this.fullScreen !== "") {
+                    this.$refs.scroll.$el.style.height = "calc(80% - 80px)";
+                    this.$refs.scroll.refresh();
+                    return;
+                }
                 this.$refs.scroll.$el.style.height = "80%";
                 this.$refs.scroll.refresh();
             } else {
+                if (this.fullScreen !== "") {
+                    this.$refs.scroll.$el.style.height = "calc(93% - 60px)";
+                    this.$refs.scroll.refresh();
+                    return;
+                }
                 this.$refs.scroll.$el.style.height = "93%";
                 this.$refs.scroll.refresh();
             }
@@ -136,7 +150,6 @@ export default {
             obj.imgSrc = song.imgSrc;
             obj.id = song.id;
             this.addSong(obj);
-            
         },
         clickSinger(index) {
             let singer = this.singers[index];
@@ -152,12 +165,23 @@ export default {
                 path: `/recommend/${SongSheet.id}`
             });
         },
+        changScroll() {
+            this.changBottom();
+            if (this.fullScreen !== "") {
+                console.log(123);
+                this.$refs.ResultScroll.$el.style.height = "calc(93% - 70px)";
+                this.$refs.ResultScroll.refresh();
+            } else {
+                this.$refs.ResultScroll.$el.style.height = "93%";
+                this.$refs.ResultScroll.refresh();
+            }
+        },
         getSearchResult() {
             if (this.searchText === "") {
                 return;
             }
             getSearchResult(this.searchText).then(res => {
-                // console.log(res);
+                console.log(res);
                 if (res.songSheet) {
                     res.songSheet.forEach(cur => {
                         let obj = {};
@@ -181,7 +205,6 @@ export default {
                         });
                         obj.id = cur.id;
                         obj.describe = `${describe}-${cur.album.name}`;
-                        console.log(cur);
                         this.songList.push(obj);
                     });
                 }
@@ -230,10 +253,28 @@ export default {
                     this.$refs["History-scroll"].refresh();
                     this.$refs["scroll"].refresh();
                 });
+                this.changBottom();
             }
-            if (newText.length < oldText.length) {
-                this.addHistory(oldText);
+            if (newText.indexOf(oldText) !== -1) {
+                //输入增加时
+                this.HistoryText = newText;
+                console.log(this.HistoryText);
+            } else if (oldText.indexOf(newText) === -1) {
+                console.log(this.HistoryText);
+                //输入删除时
+                if (this.HistoryText !== "") {
+                    this.addHistory(this.HistoryText);
+                    this.HistoryText = "";
+                }
+            } else if (newText === "") {
+                this.addHistory(this.HistoryText);
+                this.HistoryText = "";
             }
+            console.log({
+                newText,
+                oldText
+            });
+            console.log(oldText.indexOf(newText) === -1);
             this.getSearchResult();
             this.$refs.ResultScroll.scrollTo(0, 0, 0);
             this.$refs.scroll.scrollTo(0, 0, 0);
@@ -256,9 +297,11 @@ export default {
         top: 7%;
         width: 100%;
         height: 93%;
+        // height: calc(93% - 70px);
         overflow: hidden;
         left: 0;
         box-sizing: border-box;
+        // bottom: 70px;
         .ResultWapper {
             .searchResult {
                 .title {

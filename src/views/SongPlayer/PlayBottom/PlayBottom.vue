@@ -12,7 +12,7 @@
                 @click.prevent.stop="toggerPlay"
             ></span>
             <span class="iconfont icon-qianjin" @click="next"></span>
-            <span class="iconfont icon-A_-bofangliebiao"></span>
+            <span class="iconfont icon-A_-bofangliebiao" @click="setShow"></span>
         </div>
     </div>
 </template>
@@ -53,6 +53,9 @@ export default {
             }
             console.log(this.mode);
             console.log(this.iconClass);
+        },
+        setShow() {
+            this.$parent.setShow(true);
         }
     },
     watch: {
