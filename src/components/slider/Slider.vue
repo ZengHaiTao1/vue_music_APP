@@ -97,8 +97,8 @@ export default {
                     loop: self.loop, // 循环
                     threshold: 0.3,
                     speed: 400 // 轮播间隔
-                },
-                click: true
+                }
+                // click: true
             });
 
             this.slider.on("scrollEnd", () => {

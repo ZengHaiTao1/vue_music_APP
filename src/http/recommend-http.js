@@ -24,7 +24,7 @@ export function getSongs() {
  * @param  {} offset=0  偏移量
  * @param  {} limit=10  数据量
  */
-export function getSingers(cat = "", initial = "", offset = 0, limit = 10) {
+export function getSingers(cat = "", initial = "", offset = 0, limit = 20) {
     return window.axiosInstance({
         method: 'get',
         url: '/artist/list',

@@ -55,7 +55,7 @@ export default {
                 scale = 1 + Math.abs(y) / this.imageHeight;
             }
             this.$refs.singerImg.style[transform] = `scale(${scale})`;
-            if (y < this.minTransalteY) {
+            if (y < this.minTransalteY + 10) {
                 this.$refs.singerImg.classList.add("imgtop");
             } else {
                 this.$refs.singerImg.classList.remove("imgtop");

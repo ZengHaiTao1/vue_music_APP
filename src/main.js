@@ -28,7 +28,7 @@ Vue.prototype.$popup = Popup.install
 import axios from 'axios';
 const axiosInstance = axios.create({
     withCredentials: true,// 指定某个请求应该发送凭据。允许客户端携带跨域cookie，也需要此配置,
-    baseURL: "/api"
+    baseURL: "/m-api"
     // baseURL: "/m-api"
 });
 window.axiosInstance = axiosInstance  //挂载axios实例对象

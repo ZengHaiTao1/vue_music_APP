@@ -38,6 +38,7 @@ export default {
         },
         changScroll() {
             console.log(1);
+            console.log(this.isEmpty);
             if (this.fullScreen !== "" && this.currenSong) {
                 console.log(2);
                 console.log(this.currenSong);
@@ -51,15 +52,20 @@ export default {
             }
         }
     },
+    watch:{
+        isEmpty(){
+            console.log("isEmpty------------------")
+        }
+    },
     mounted() {
         getToplist().then(res => {
-            console.log(res.data.list);
+            // console.log(res.data.list);
             res.data.list.forEach(cur => {
                 cur.bottomText = cur.name;
                 cur.rightText = cur.updateFrequency;
             });
             this.rankList = res.data.list;
-            console.log(this.rankList);
+            // console.log(this.rankList);
         });
         this.changScroll();
     },

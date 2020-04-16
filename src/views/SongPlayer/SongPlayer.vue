@@ -38,7 +38,9 @@
             </transition>
 
             <!-------    mini播放器部分   ------>
-            <PlayerMini @setShow="setShow"></PlayerMini>
+            <keep-alive>
+                <PlayerMini :Handover="Handover" :playingLyric="playingLyric" @setShow="setShow"></PlayerMini>
+            </keep-alive>
 
             <!--播放列表  -->
             <PlayList :show="showPlaylist" @setShow="setShow"></PlayList>
@@ -61,7 +63,7 @@ import playMixin from "@/mixin/play";
 import animations from "create-keyframe-animation";
 import { prefixStyle } from "@/utils/dom.js";
 const transform = prefixStyle("transform");
-
+//相关组件
 import Progressbar from "@/components/Progressbar/Progressbar";
 import PlayerTop from "@/views/SongPlayer/PlayerTop/PlayerTop";
 import PlayerCenter from "@/views/SongPlayer/PlayerCenter/PlayerCenter";
@@ -69,6 +71,7 @@ import PlayerMini from "@/views/SongPlayer/PlayerMini/PlayerMini";
 import PlayBottom from "@/views/SongPlayer/PlayBottom/PlayBottom";
 import PlayList from "@/views/SongPlayer/Play-list/Play-list";
 
+const interval = 500; //切换间隔
 export default {
     mixins: [playMixin],
     data() {
@@ -76,7 +79,9 @@ export default {
             songReady: false,
             currentTime: "", //当前事件
             duration: "", //歌曲时长
-            showPlaylist: false //控制播放列表显示
+            showPlaylist: false, //控制播放列表显示,
+            playingLyric: "",
+            Handover: false
         };
     },
     methods: {
@@ -173,6 +178,13 @@ export default {
             this.$refs.PlayerCenter.togglePlaying();
         },
         prev() {
+            if (this.Handover) {
+                return;
+            }
+            this.Handover = true;
+            setTimeout(() => {
+                this.Handover = false;
+            }, interval);
             if (!this.songReady) {
                 return;
             }
@@ -189,6 +201,13 @@ export default {
                 "rotate(0deg)";
         },
         next() {
+            if (this.Handover) {
+                return;
+            }
+            this.Handover = true;
+            setTimeout(() => {
+                this.Handover = false;
+            }, interval);
             if (!this.songReady) {
                 return;
             }
@@ -221,8 +240,8 @@ export default {
         },
         error() {
             this.songReady = true;
-            this.next();
             alert("该歌曲没有版权或者是会员歌曲，请切换");
+            this.next();
         },
         updateTime(e) {
             if (!this.currenSong) {

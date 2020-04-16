@@ -26,5 +26,6 @@ export default {
 <style lang = "scss">
 body {
     background: rgb(242, 243, 244);
+    font-family: serif;
 }
 </style>

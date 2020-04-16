@@ -11,7 +11,7 @@ export default {
             // immediate: true,  //是否先执行一次，
         },
         isEmpty: {
-            handler: "changScroll"
+            handler: 'changScroll',
         }
     },
     methods: {

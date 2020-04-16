@@ -52,7 +52,7 @@ const mutations = {
             state.currentIndex++;
         }
         state.fullScreen = true
-        console.log(state.playlist)
+        // console.log(state.playlist)
     },
     deleteById(state, id) {
         let index = state.playlist.findIndex((cur) => {
@@ -61,10 +61,13 @@ const mutations = {
         state.playlist.splice(index, 1)
     },
     clearSongList(state) {
+        if (!state.fullScreen) {
+            state.fullScreen = true
+        }
         state.fullScreen = false
         state.mode = "order"
         state.playing = false
-        state.playlist.length = 0
+        state.playlist = []  //直接对数组的length属性操作时，vuex监听不到
         state.currentIndex = -1
     }
 }

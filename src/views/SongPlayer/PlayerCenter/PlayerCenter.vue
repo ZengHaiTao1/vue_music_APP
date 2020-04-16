@@ -60,6 +60,9 @@ export default {
             playingLyric: ""
         };
     },
+    created() {
+        this.timer = "";
+    },
     methods: {
         chang() {
             if (this.currentShow === "cd") {
@@ -97,7 +100,8 @@ export default {
             } else {
                 this.$refs.lyricList.scrollTo(0, 0, 1000);
             }
-            this.playingLyric = txt;
+            // this.playingLyric = txt;
+            this.$parent.playingLyric = txt;
         },
         togglePlaying() {
             if (this.currentLyric) {
@@ -120,7 +124,10 @@ export default {
                 this.playingLyric = "";
                 this.currentLineNum = 0;
             }
-            this.getLyric();
+            clearTimeout(this.timer);
+            this.timer = setTimeout(() => {
+                this.getLyric();
+            }, 100);
         }
     }
 };
