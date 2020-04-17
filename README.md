@@ -76,17 +76,17 @@ vue_music_app
 
 迷你播放器，可以左右滑动，切换歌曲
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B8.gif)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B8.gif)
 
 
 全屏播放器，可以显示歌词，进度条的拖拽,播放模式的切换
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B83.gif?token=AIXH2DVS5JX53RHO2G6LUIC6TEKNI)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B83.gif)
 
 
 播放列表，删除歌曲，切换歌曲，删除全部歌曲
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B84.gif?token=AIXH2DVHYXYMRB47AXWJN6S6TELMS)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B84.gif)
 
 
 
@@ -94,21 +94,21 @@ vue_music_app
 
 可以获得热搜榜，存储搜索历史，点击搜索相关的歌手，歌单，歌曲
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%90%9C%E7%B4%A2%E9%83%A8%E5%88%86.gif?token=AIXH2DUK7Q2WNNUV3Q4WJRC6TEOKI)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%90%9C%E7%B4%A2%E9%83%A8%E5%88%86.gif)
 
 ## 排行榜
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%8E%92%E8%A1%8C%E6%A6%9C.gif)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%8E%92%E8%A1%8C%E6%A6%9C.gif)
 
 
 ## 歌手
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%AD%8C%E6%89%8B%E9%A1%B5%E9%9D%A2.gif)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%AD%8C%E6%89%8B%E9%A1%B5%E9%9D%A2.gif)
 
 
 ## 推荐
 
-![](https://github.com/ZengHaiTao1/PIC/raw/master/music-img/%E6%8E%A8%E8%8D%90%E9%A1%B5%E9%9D%A2.gif)
+![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%8E%A8%E8%8D%90%E9%A1%B5%E9%9D%A2.gif)
 
 
 
