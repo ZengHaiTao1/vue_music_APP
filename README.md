@@ -55,7 +55,7 @@ vue_music_app
 ├── puliic  #静态资源目录 
 │   ├── img # 静态图片
 │   └── index.html 
-├── src  # 核心源码vue_music_ap
+├── src  # 核心源码
 │   ├── assets  #公共css，一些需要打包处理的静态文件
 ├   ├── components    #基础组件
 │   ├── http  #api请求
