@@ -75,7 +75,7 @@ vue_music_app
 ## 播放器部分
 
 迷你播放器，可以左右滑动，切换歌曲
-<img  src = "https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B8.gif"/>
+<div><img  src = "https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B8.gif"/></div>
 
 ![](https://raw.githubusercontent.com/ZengHaiTao1/PIC/master/music-img/1.gif?token=AIXH2DXF3NWWSEPGYANSW3K6UUGUQ)
 ![](https://zhtblog-1300797618.cos.ap-guangzhou.myqcloud.com/musi-app/%E6%92%AD%E6%94%BE%E5%99%A8%E5%86%85%E6%A0%B8.gif)
