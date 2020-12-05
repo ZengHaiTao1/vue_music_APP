@@ -128,7 +128,7 @@ export default {
                 this.$refs.slider.enable();
             }
         }
-    }
+    },
 };
 </script>
 
